@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:physio/Widget/GeneralWidget.dart';
+import 'package:physio/Widget/generalWidget.dart';
 
 import '../../../Database/Database.dart';
 import '../../../Widget/AppBar.dart';
@@ -30,6 +30,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
   GlobalKey<FormState> addKey = GlobalKey();
   String? selectedCondition;
   String? generatedPassword;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,3 +167,4 @@ class _AddNewPatientState extends State<AddNewPatient> {
     );
   }
 }
+
