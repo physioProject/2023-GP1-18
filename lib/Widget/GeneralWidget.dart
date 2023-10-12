@@ -14,7 +14,7 @@ class AppWidget {
     return LayoutBuilder(builder: ((context, constraints) {
       return NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (OverscrollIndicatorNotification? overscroll) {
-            overscroll!.disallowGlow();
+            overscroll!.disallowIndicator();
             return true;
           },
           child: SingleChildScrollView(
@@ -100,3 +100,4 @@ class AppWidget {
         (_) => characters.codeUnitAt(random.nextInt(characters.length))));
   }
 }
+
