@@ -13,7 +13,7 @@ import '../../../Widget/AppPopUpMen.dart';
 import '../../../Widget/AppRoutes.dart';
 import '../../../Widget/AppSize.dart';
 import '../../../Widget/AppText.dart';
-import '../../../Widget/GeneralWidget.dart';
+import '../../../Widget/generalWidget.dart';
 import '../../Account/Login.dart';
 import 'UpdateTherapist.dart';
 
@@ -88,6 +88,7 @@ class _ViewTherapistState extends State<ViewTherapist> {
                                 lastName: data['lastName'],
                                 phone: data['phone'],
                                 email: data['email'],
+                                  userId:data['userId']
                               ));
                         },
                         tileColor: AppColor.white,
