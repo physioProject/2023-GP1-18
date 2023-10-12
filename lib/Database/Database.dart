@@ -4,6 +4,7 @@ import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 import '../Widget/AppConstants.dart';
 
+
 class Database {
   static final GoogleSignIn _googleSignIn =
       GoogleSignIn(scopes: ['https://mail.google.com/']);
@@ -15,6 +16,7 @@ class Database {
       required String password,
       required String phone,
       required int age,
+
       required String condition}) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -30,6 +32,8 @@ class Database {
           'age': age,
           'phone': phone,
           'condition': condition,
+          'therapistName':'undefined',
+          'therapistId':'undefined',
           'type': 'patient',
           'status': 0
         });
@@ -55,6 +59,7 @@ class Database {
     required String email,
     required String password,
     required String phone,
+
   }) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -120,6 +125,7 @@ class Database {
       required String docId,
       required String phone,
       required int age,
+
       required String condition}) async {
     try {
       await AppConstants.userCollection.doc(docId).update({
@@ -127,6 +133,7 @@ class Database {
         'lastName': lastName,
         'age': age,
         'phone': phone,
+
         'condition': condition,
       });
       return 'done';
@@ -134,6 +141,7 @@ class Database {
       return 'error';
     }
   }
+
 
 //=======================therapist SingUp ======================================
   static Future<String> updateTherapist({
@@ -195,3 +203,4 @@ class Database {
     return _googleSignIn.signOut();
   }
 }
+
