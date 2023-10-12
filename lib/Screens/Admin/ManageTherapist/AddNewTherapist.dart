@@ -12,7 +12,7 @@ import '../../../Widget/AppLoading.dart';
 import '../../../Widget/AppMessage.dart';
 import '../../../Widget/AppTextFields.dart';
 import '../../../Widget/AppValidator.dart';
-import '../../../Widget/GeneralWidget.dart';
+import '../../../Widget/generalWidget.dart';
 
 class AddNewTherapist extends StatefulWidget {
   const AddNewTherapist({Key? key}) : super(key: key);
