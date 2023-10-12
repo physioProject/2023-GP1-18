@@ -1,6 +1,7 @@
 class AppMessage {
   static String mandatoryTx = 'Mandatory field';
   static String invalidName = 'The name is not valid';
+  static String invalidPatientCount='number of patient is not valid';
   static String invalidEmail = 'The email is not valid';
   static String invalidPassword = 'Password must be at least 6 digits';
   static String invalidPhone = 'Invalid phone number';
@@ -11,6 +12,8 @@ class AppMessage {
   static String lastName = 'Last Name';
   static String age = 'Age';
   static String condition = 'Medical condition';
+  static String therapist = 'Therapist Name';
+  static String noPatient = 'Number of Patients';
   static String type = 'Authorization';
   static String emailTx = 'Email';
   static String passwordTx = 'Password';
