@@ -61,4 +61,16 @@ class AppValidator {
     }
     return null;
   }
+  //valid patient count
+  static String? validatorPatientCount(count) {
+    final countRegExp = RegExp(r"^\d+$");
+    if (count.isEmpty) {
+      return AppMessage.mandatoryTx;
+    }
+    if (countRegExp.hasMatch(count) == false) {
+      return AppMessage.invalidPatientCount;
+    } else {
+      return null;
+    }
+  }
 }
