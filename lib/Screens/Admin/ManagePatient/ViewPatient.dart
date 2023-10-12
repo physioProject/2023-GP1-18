@@ -11,7 +11,7 @@ import 'package:physio/Widget/AppPopUpMen.dart';
 import 'package:physio/Widget/AppRoutes.dart';
 import 'package:physio/Widget/AppSize.dart';
 import 'package:physio/Widget/AppText.dart';
-import 'package:physio/Widget/GeneralWidget.dart';
+import 'package:physio/Widget/generalWidget.dart';
 
 import '../../../Widget/AppColor.dart';
 import '../../../Widget/AppConstants.dart';
@@ -90,6 +90,8 @@ class _ViewPatientState extends State<ViewPatient> {
                                 age: data['age'],
                                 condition: data['condition'],
                                 email: data['email'],
+                                therapistName: data['therapistName'],
+
                               ));
                         },
                         tileColor: AppColor.white,
