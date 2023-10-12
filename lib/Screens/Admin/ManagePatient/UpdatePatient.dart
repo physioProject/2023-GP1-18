@@ -12,6 +12,7 @@ import '../../../Widget/AppLoading.dart';
 import '../../../Widget/AppMessage.dart';
 import '../../../Widget/AppTextFields.dart';
 import '../../../Widget/AppValidator.dart';
+import '../../../Widget/AppText.dart';
 
 class UpdatePatient extends StatefulWidget {
   final String docId;
@@ -21,6 +22,8 @@ class UpdatePatient extends StatefulWidget {
   final String email;
   final int age;
   final String condition;
+  final String therapistName;
+
   const UpdatePatient(
       {Key? key,
       required this.docId,
@@ -29,6 +32,8 @@ class UpdatePatient extends StatefulWidget {
       required this.phone,
       required this.age,
       required this.condition,
+        required this.therapistName,
+
       required this.email})
       : super(key: key);
 
@@ -42,6 +47,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailPathController = TextEditingController();
   TextEditingController ageController = TextEditingController();
+  TextEditingController therapistNameController = TextEditingController();
   GlobalKey<FormState> updateKey = GlobalKey();
   String? selectedCondition;
   @override
@@ -53,6 +59,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
     emailPathController.text = widget.email;
     phoneController.text = widget.phone;
     selectedCondition = widget.condition;
+    therapistNameController.text= widget.therapistName;
   }
 
   @override
@@ -145,6 +152,22 @@ class _UpdatePatientState extends State<UpdatePatient> {
               SizedBox(
                 height: 10.h,
               ),
+//==============================therapist Name===============================================================
+               AppTextFields(
+                controller:therapistNameController,
+                labelText:AppMessage.therapist,
+
+                validator: (v) => AppValidator.validatorName(v),
+                obscureText: false,
+                    enable:false,
+
+                 ),
+
+
+
+              SizedBox(
+                height: 10.h,
+              ),
 
 //==============================Add Button===============================================================
               AppButtons(
@@ -184,3 +207,4 @@ class _UpdatePatientState extends State<UpdatePatient> {
     );
   }
 }
+
