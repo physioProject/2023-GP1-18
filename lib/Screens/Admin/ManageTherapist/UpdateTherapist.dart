@@ -1,3 +1,5 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +9,7 @@ import '../../../Widget/AppBar.dart';
 import '../../../Widget/AppButtons.dart';
 import '../../../Widget/AppColor.dart';
 import '../../../Widget/AppConstants.dart';
-import '../../../Widget/AppDropList.dart';
+
 import '../../../Widget/AppLoading.dart';
 import '../../../Widget/AppMessage.dart';
 import '../../../Widget/AppTextFields.dart';
@@ -19,14 +21,20 @@ class UpdateTherapist extends StatefulWidget {
   final String lastName;
   final String phone;
   final String email;
+
+  final String userId;
   const UpdateTherapist(
       {Key? key,
       required this.docId,
       required this.firstName,
       required this.lastName,
       required this.phone,
-      required this.email})
+      required this.email,
+        required this.userId,
+      })
       : super(key: key);
+
+
 
   @override
   State<UpdateTherapist> createState() => _UpdatePatientState();
@@ -37,8 +45,9 @@ class _UpdatePatientState extends State<UpdateTherapist> {
   TextEditingController lastNameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailPathController = TextEditingController();
+  TextEditingController patientCountController = TextEditingController();
   GlobalKey<FormState> updateKey = GlobalKey();
-
+int? patientCount;
   @override
   void initState() {
     // TODO: implement initState
@@ -46,7 +55,26 @@ class _UpdatePatientState extends State<UpdateTherapist> {
     lastNameController.text = widget.lastName;
     emailPathController.text = widget.email;
     phoneController.text = widget.phone;
+
+
+      super.initState();
+      fetchPatientCount().then((count) {
+        setState(() {
+          patientCount = count;
+          patientCountController.text=count.toString();
+
+      });
+
+  });}
+  //==============================Count Number of patient===============================================================
+  Future<int> fetchPatientCount() async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('therapistId', isEqualTo: widget.userId)
+        .get();
+    return querySnapshot.docs.length;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +133,17 @@ class _UpdatePatientState extends State<UpdateTherapist> {
               SizedBox(
                 height: 10.h,
               ),
-
+//==============================Number of Patients===============================================================
+              AppTextFields(
+                controller: patientCountController,
+                labelText: AppMessage.noPatient,
+                validator: (v) => AppValidator.validatorPatientCount(v),
+                obscureText: false,
+                enable: false,
+              ),
+              SizedBox(
+                height: 10.h,
+              ),
 //==============================Add Button===============================================================
               AppButtons(
                 text: AppMessage.update,
