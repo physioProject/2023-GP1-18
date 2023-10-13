@@ -111,7 +111,7 @@ class _LoginState extends State<Login> {
 
 //==============================Add Button===============================================================
                 AppButtons(
-                  text: AppMessage.add,
+                  text: AppMessage.loginTx,
                   bagColor: AppColor.iconColor,
                   onPressed: () async {
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -121,7 +121,6 @@ class _LoginState extends State<Login> {
                         email: emailController.text.trim(),
                         password: passwordController.text,
                       ).then((v) {
-                        print('================$v');
                         if (v == 'error') {
                           Navigator.pop(context);
                           AppLoading.show(
