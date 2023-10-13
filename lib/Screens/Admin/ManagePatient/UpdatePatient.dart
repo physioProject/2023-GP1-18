@@ -153,15 +153,23 @@ class _UpdatePatientState extends State<UpdatePatient> {
                 height: 10.h,
               ),
 //==============================therapist Name===============================================================
-               AppTextFields(
+                           AppTextFields(
                 controller:therapistNameController,
                 labelText:AppMessage.therapist,
 
-                validator: (v) => AppValidator.validatorName(v),
+    validator: (v) {
+    if (v == null) {
+    return AppMessage.mandatoryTx;
+    } else {
+    return null;
+    }
+    },
+
                 obscureText: false,
                     enable:false,
 
                  ),
+
 
 
 

@@ -142,7 +142,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
                       age: int.parse(ageController.text),
                       condition: selectedCondition!,
                     ).then((v) {
-                      print('================$v');
+
                       if (v == "done") {
                         Navigator.pop(context);
                         Navigator.pop(context);
