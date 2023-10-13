@@ -112,26 +112,26 @@ class _LoginState extends State<Login> {
                   height: 10.h,
                 ),
 //////==============================Forgot password ========================================================
-              Padding(padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(mainAxisAlignment: MainAxisAlignment.center,
-                     children: [ GestureDetector(
-                       onTap:()
+                Padding(padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Row(mainAxisAlignment: MainAxisAlignment.center,
+                    children: [ GestureDetector(
+                      onTap:()
                       {
-                         Navigator.push
-                           (context,MaterialPageRoute(builder: (context) {return ForgotPassword();
-                         },
+                        Navigator.push
+                          (context,MaterialPageRoute(builder: (context) {return ForgotPassword();
+                        },
                         ),
                         );
-                     },
+                      },
                       child: Text('Forgot password?' , style:TextStyle(color: Colors.white,fontWeight: FontWeight.bold, decoration: TextDecoration.underline,
-                   ),
                       ),
-                       ),
-                 ],
-                   ),
+                      ),
+                    ),
+                    ],
+                  ),
                 ),
                 SizedBox(
-                 height: 10.h,
+                  height: 10.h,
                 ),
 
 
