@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:physio/Screens/Account/ForgotPassword.dart';
 import 'package:physio/Screens/Admin/AdminHome.dart';
 import 'package:physio/Widget/AppImage.dart';
 import 'package:physio/Widget/AppRoutes.dart';
@@ -66,6 +67,28 @@ class _LoginState extends State<Login> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+
+                //==============================Type Menu===============================================================
+                AppDropList(
+                  listItem: AppConstants.typeMenu,
+                  validator: (v) {
+                    if (v == null) {
+                      return AppMessage.mandatoryTx;
+                    } else {
+                      return null;
+                    }
+                  },
+                  onChanged: (selectedItem) {
+                    selectedType = selectedItem;
+                  },
+                  hintText: AppMessage.type,
+                  dropValue: selectedType,
+                  fillColor: AppColor.opacityFillColor,
+                ),
+                SizedBox(
+                  height: 20.h,
+                ),
+
 //==============================Email===============================================================
                 AppTextFields(
                   controller: emailController,
@@ -88,30 +111,34 @@ class _LoginState extends State<Login> {
                 SizedBox(
                   height: 10.h,
                 ),
-//==============================Type Menu===============================================================
-                AppDropList(
-                  listItem: AppConstants.typeMenu,
-                  validator: (v) {
-                    if (v == null) {
-                      return AppMessage.mandatoryTx;
-                    } else {
-                      return null;
-                    }
-                  },
-                  onChanged: (selectedItem) {
-                    selectedType = selectedItem;
-                  },
-                  hintText: AppMessage.type,
-                  dropValue: selectedType,
-                  fillColor: AppColor.opacityFillColor,
+//////==============================Forgot password ========================================================
+              Padding(padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Row(mainAxisAlignment: MainAxisAlignment.center,
+                     children: [ GestureDetector(
+                       onTap:()
+                      {
+                         Navigator.push
+                           (context,MaterialPageRoute(builder: (context) {return ForgotPassword();
+                         },
+                        ),
+                        );
+                     },
+                      child: Text('Forgot password?' , style:TextStyle(color: Colors.white,fontWeight: FontWeight.bold, decoration: TextDecoration.underline,
+                   ),
+                      ),
+                       ),
+                 ],
+                   ),
                 ),
                 SizedBox(
-                  height: 20.h,
+                 height: 10.h,
                 ),
+
+
 
 //==============================Add Button===============================================================
                 AppButtons(
-                  text: AppMessage.add,
+                  text: AppMessage.loginTx,
                   bagColor: AppColor.iconColor,
                   onPressed: () async {
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -121,7 +148,6 @@ class _LoginState extends State<Login> {
                         email: emailController.text.trim(),
                         password: passwordController.text,
                       ).then((v) {
-                        print('================$v');
                         if (v == 'error') {
                           Navigator.pop(context);
                           AppLoading.show(
