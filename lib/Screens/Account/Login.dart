@@ -66,6 +66,28 @@ class _LoginState extends State<Login> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+
+ //==============================Type Menu===============================================================
+                AppDropList(
+                  listItem: AppConstants.typeMenu,
+                  validator: (v) {
+                    if (v == null) {
+                      return AppMessage.mandatoryTx;
+                    } else {
+                      return null;
+                    }
+                  },
+                  onChanged: (selectedItem) {
+                    selectedType = selectedItem;
+                  },
+                  hintText: AppMessage.type,
+                  dropValue: selectedType,
+                  fillColor: AppColor.opacityFillColor,
+                ),
+                SizedBox(
+                  height: 20.h,
+                ),
+
 //==============================Email===============================================================
                 AppTextFields(
                   controller: emailController,
@@ -87,26 +109,6 @@ class _LoginState extends State<Login> {
                 ),
                 SizedBox(
                   height: 10.h,
-                ),
-//==============================Type Menu===============================================================
-                AppDropList(
-                  listItem: AppConstants.typeMenu,
-                  validator: (v) {
-                    if (v == null) {
-                      return AppMessage.mandatoryTx;
-                    } else {
-                      return null;
-                    }
-                  },
-                  onChanged: (selectedItem) {
-                    selectedType = selectedItem;
-                  },
-                  hintText: AppMessage.type,
-                  dropValue: selectedType,
-                  fillColor: AppColor.opacityFillColor,
-                ),
-                SizedBox(
-                  height: 20.h,
                 ),
 
 //==============================Add Button===============================================================
