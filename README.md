@@ -1,5 +1,7 @@
 # physio
 The Physio Application is a virtual reality-based solution aimed at improving physical care and rehabilitation. It utilizes Agile methodologies and VR technology to provide a time-efficient and cost-effective tool for both patients and therapists.
+
+
 Technology:
  • Programming Language: flutter
  • Integrated Development Environment: Visual Studio
