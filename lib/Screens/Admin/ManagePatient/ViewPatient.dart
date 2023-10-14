@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:physio/Database/Database.dart';
@@ -25,6 +26,7 @@ class ViewPatient extends StatefulWidget {
 }
 
 class _ViewPatientState extends State<ViewPatient> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,8 +138,11 @@ class _ViewPatientState extends State<ViewPatient> {
                         ),
 //delete icon==================================================================================================
                         trailing: InkWell(
-                          onTap: () {
+                          onTap: () async {
                             //write delete code her
+                            await Database.deleteAccount(context,
+                              docId: snapshot.data.docs[i].id,
+                            );
                             debugPrint('delete code');
                           },
                           child: Icon(
@@ -166,5 +171,7 @@ class _ViewPatientState extends State<ViewPatient> {
           );
   }
 }
+
+
 
 //=========================================

@@ -133,8 +133,10 @@ class _ViewTherapistState extends State<ViewTherapist> {
                         ),
 //delete icon==================================================================================================
                         trailing: InkWell(
-                          onTap: () {
-                            //write delete code her
+                          onTap: () async {
+                            await Database.deleteAccount(context,
+                              docId: snapshot.data.docs[i].id,
+                            );
                             debugPrint('delete code');
                           },
                           child: Icon(
