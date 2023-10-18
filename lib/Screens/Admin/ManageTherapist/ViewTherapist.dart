@@ -99,7 +99,7 @@ class _ViewTherapistState extends State<ViewTherapist> {
                             AppLoading.show(context, '', 'lode');
                             Database.sendPasswordToUser(data: data)
                                 .then((v) async {
-                              print('================$v');
+                            
                               if (v == "done") {
                                 await Database.updateAccountStatus(
                                   docId: snapshot.data.docs[i].id,
@@ -120,7 +120,7 @@ class _ViewTherapistState extends State<ViewTherapist> {
                             AppIcons.profile,
                             size: 45.spMin,
                             color: data['status'] == 0
-                                ? AppColor.errorColor
+                                ? AppColor.black
                                 : null,
                           ),
                         ),
