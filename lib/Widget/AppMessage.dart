@@ -28,6 +28,7 @@ class AppMessage {
   static String update = 'Update';
   static String noData = 'There is no data to display at this time';
   static String add = 'Add';
+   static String RestTx='Reset password';
   static String done = 'The operation completed successfully';
   static String manageAccount = 'Manage';
   static String managePatient = 'Patients';
