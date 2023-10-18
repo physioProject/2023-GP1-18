@@ -1,16 +1,36 @@
 # physio
+The Physio Application is a virtual reality-based solution aimed at improving physical care and rehabilitation. It utilizes Agile methodologies and VR technology to provide a time-efficient and cost-effective tool for both patients and therapists.
 
-A new Flutter project.
+
+Technology:
+
+ • Programming Language: flutter
+ 
+ • Integrated Development Environment: Visual Studio
+ 
+ • Game Engine: Unity3D
+ 
+ • 3D Modeling Software: Blender
+ 
+ • Additional Language: Python
+ 
+ • Project Management Tool: Jira
+ 
+ • Version Control System: GitHub
+ 
+ • Additional Language: c#
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Launching Instructions: 
+To launch the AgileVR Physiotherapy Application, follow these steps:
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ 1 Make sure you have a compatible VR headset.
+ 
+ 2 Install Visual Studio and Unity3D.
+ 
+ 3 Clone the project repository from GitHub.
+ 
+ 4 Open the project in Visual Studio and Unity3D.
+ 
+ 5 Build and deploy the application to your VR headset following the provided instructions.

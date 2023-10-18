@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
@@ -202,4 +204,46 @@ class Database {
   static Future singOutFromGoogleAccount() {
     return _googleSignIn.signOut();
   }
+
+  //=======================delete account======================================
+
+  static deleteAccount(BuildContext context,{required String docId}) async {
+    try {
+      showDialog(context: context, builder:(BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete User'),
+          content: const Text(
+            "Are you sure you want to delete the user",
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Delete'),
+              onPressed: () async {
+                await AppConstants.userCollection.doc(docId).delete();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },);
+
+
+    } catch (e) {
+
+    }
+  }
+
+
 }
