@@ -27,7 +27,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       showSnackBar(AppMessage.sureEmail);
       return;
     }
-//===========================Check if the user is registered===============================
+//=============================Check if the user is registered===============================
     try {
       if (await isEmailRegistered(email)) {
         await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
