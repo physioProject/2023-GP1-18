@@ -2,6 +2,8 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:physio/Widget/AppButtons.dart';
+import 'package:physio/Widget/AppTextFields.dart';
 import '../../Widget/AppMessage.dart';
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
@@ -99,7 +101,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black12,
+        backgroundColor: Colors.black,
         elevation: 0,
       ),
       body: Column(
@@ -113,6 +115,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               style: TextStyle(fontSize: 20),
             ),
           ),
+
           SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -120,21 +123,25 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               controller: emailController,
               decoration: InputDecoration(
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.purple),
+                  borderSide: BorderSide(color: Colors.blueGrey),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                hintText: 'Email',
-                fillColor: Colors.grey,
+                hintText: AppMessage.emailTx,
+                fillColor: Colors.white,
                 filled: true,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          MaterialButton(
-            onPressed: passReset,
-            child: Text('Reset password'),
-            color: Colors.blueGrey,
-          ),
+
+          SizedBox(height: 15),
+          SizedBox(
+            width: 200.0,
+            height: 40.0,
+            child: AppButtons(
+              onPressed: passReset,
+              text: 'Reset password',
+            ),
+          )
         ],
       ),
     );
