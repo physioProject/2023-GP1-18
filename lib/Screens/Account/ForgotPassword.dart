@@ -1,48 +1,102 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../Widget/AppMessage.dart';
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
 
   @override
   State<ForgotPassword> createState() => _ForgotPasswordState();
 }
-class _ForgotPasswordState extends State<ForgotPassword> {
 
-  final _emailController = TextEditingController();
+class _ForgotPasswordState extends State<ForgotPassword> {
+  final emailController = TextEditingController();
 
   @override
   void dispose() {
-    _emailController.dispose();
+    emailController.dispose();
     super.dispose();
   }
 
-  Future passReset() async {
-    // class start
-    try { // try starts
-      await FirebaseAuth.instance.sendPasswordResetEmail(
-          email: _emailController.text.trim());
-      showDialog(context: context, builder: (context) {
-        return AlertDialog(content: Text(
-            'The reset link has been sent to your email. Please check it.'),
+  Future<void> passReset() async {
+    final email = emailController.text.trim();
+
+    //===================================== Check the email format=================================
+    if (!isEmailValid(email)) {
+      showSnackBar(AppMessage.sureEmail);
+      return;
+    }
+//===========================Check if the user is registered===============================
+    try {
+      if (await isEmailRegistered(email)) {
+        await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+        showSuccessDialog(AppMessage.sendEmail);
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text(AppMessage.userNotFound),
+            );
+          },
+        );
+      }
+    }
+    //===========================Catch other exceptions =============================
+    on FirebaseAuthException catch (e) {
+      showAlertDialog('Error: ${e.message}');
+    } catch (e) {
+      showAlertDialog('An unexpected error occurred.');
+    }
+  }
+
+  bool isEmailValid(String email) {
+    return EmailValidator.validate(email);
+  }
+
+  Future<bool> isEmailRegistered(String email) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
+  }
+
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  void showAlertDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(message),
         );
       },
-      );
-    } //try ends
+    );
+  }
 
-    on FirebaseAuthException catch (e) { //catch
-      print(e);
-      showDialog(context: context, builder: (context) {
-        return AlertDialog(content: Text(e.message.toString()),
+  void showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(message),
         );
-      });
-    } //catch
-  } //class ends
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // class starts
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black12,
@@ -51,21 +105,24 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child:
-            Text('Please enter your email so we can send you a reset link',
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: Text(
+              'Please enter your email so we can send you a reset link',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20),
             ),
           ),
           SizedBox(height: 10),
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 25.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: TextField(
-              controller: _emailController,
-              decoration: InputDecoration(enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.purple),
-                borderRadius: BorderRadius.circular(12),
-              ),
+              controller: emailController,
+              decoration: InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.purple),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 hintText: 'Email',
                 fillColor: Colors.grey,
                 filled: true,
@@ -82,9 +139,4 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       ),
     );
   }
-
-
-
-
 }
-

@@ -7,27 +7,27 @@ import '../Widget/AppConstants.dart';
 
 class Database {
   static final GoogleSignIn _googleSignIn =
-      GoogleSignIn(scopes: ['https://mail.google.com/']);
+  GoogleSignIn(scopes: ['https://mail.google.com/']);
 //=======================patient SingUp ======================================
   static Future<String> patientSingUp(
       {required String firstName,
-      required String lastName,
-      required String email,
-      required String password,
-      required String phone,
-      required int age,
+        required String lastName,
+        required String email,
+        required String password,
+        required String phone,
+        required int age,
 
-      required String condition}) async {
+        required String condition}) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-              email: email.trim(), password: password);
+          email: email.trim(), password: password);
       if (userCredential.user != null) {
         await AppConstants.userCollection.add({
           'firstName': firstName,
           'lastName': lastName,
           'userId': userCredential.user?.uid,
-          'password': password,
+
           'email': email,
           'age': age,
           'phone': phone,
@@ -64,13 +64,13 @@ class Database {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-              email: email.trim(), password: password);
+          email: email.trim(), password: password);
       if (userCredential.user != null) {
         await AppConstants.userCollection.add({
           'firstName': firstName,
           'lastName': lastName,
           'userId': userCredential.user?.uid,
-          'password': password,
+
           'email': email,
           'phone': phone,
           'type': 'therapist',
@@ -121,12 +121,12 @@ class Database {
   //=======================patient SingUp ======================================
   static Future<String> updatePatient(
       {required String firstName,
-      required String lastName,
-      required String docId,
-      required String phone,
-      required int age,
+        required String lastName,
+        required String docId,
+        required String phone,
+        required int age,
 
-      required String condition}) async {
+        required String condition}) async {
     try {
       await AppConstants.userCollection.doc(docId).update({
         'firstName': firstName,
@@ -203,4 +203,3 @@ class Database {
     return _googleSignIn.signOut();
   }
 }
-
