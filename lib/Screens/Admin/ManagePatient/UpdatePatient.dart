@@ -193,7 +193,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
                       condition: selectedCondition!,
                       docId: widget.docId,
                     ).then((v) {
-                      print('================$v');
+                     
                       if (v == "done") {
                         Navigator.pop(context);
                         Navigator.pop(context);
