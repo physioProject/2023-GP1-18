@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -232,6 +233,7 @@ class Database {
               child: const Text('Delete'),
               onPressed: () async {
                 await AppConstants.userCollection.doc(docId).delete();
+                await FirebaseAuth.instance.currentUser!.delete();
                 Navigator.of(context).pop();
               },
             ),
