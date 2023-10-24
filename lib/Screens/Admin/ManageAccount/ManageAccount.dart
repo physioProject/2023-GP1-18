@@ -100,9 +100,9 @@ class _ManageAccountState extends State<ManageAccount> {
        child: SizedBox(
         height: 100.h,
        width: double.maxFinite,
-       child: Card(
-        elevation: 5,
-        child: Center(
+       child: Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15.w),
           child: Column(
              children: [
                ListTile(
@@ -123,6 +123,7 @@ class _ManageAccountState extends State<ManageAccount> {
       //======================= AppDropList configuration ======================================
          AppDropList(
           listItem: therapistNames,
+
            validator: (v) {
              if (v == null) {
               return AppMessage.mandatoryTx;
@@ -150,10 +151,11 @@ class _ManageAccountState extends State<ManageAccount> {
     ),
     ),
     ),
-      );
+      ));
       },
     );
   }
+
 
 
   //=======================update the Therapist Name for specific patient ======================================
