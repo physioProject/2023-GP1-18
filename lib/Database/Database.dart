@@ -29,7 +29,7 @@ class Database {
           'firstName': firstName,
           'lastName': lastName,
           'userId': userCredential.user?.uid,
-
+          'password': password,
           'email': email,
           'age': age,
           'phone': phone,
@@ -72,7 +72,7 @@ class Database {
           'firstName': firstName,
           'lastName': lastName,
           'userId': userCredential.user?.uid,
-
+          'password': password,
           'email': email,
           'phone': phone,
           'type': 'therapist',
@@ -232,6 +232,7 @@ class Database {
               child: const Text('Delete'),
               onPressed: () async {
                 await AppConstants.userCollection.doc(docId).delete();
+                await FirebaseAuth.instance.currentUser!.delete();
                 Navigator.of(context).pop();
               },
             ),
