@@ -141,7 +141,7 @@ class _ManageAccountState extends State<ManageAccount> {
                  } else {
                     print('Error updating therapist ID');}},
 
-          hintText: 'Select a therapist',
+          hintText: 'Therapists list',
          dropValue: selectedTherapists[patientId],
 
     ),
