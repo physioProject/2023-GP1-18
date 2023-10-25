@@ -28,7 +28,8 @@ class _ManageAccountState extends State<ManageAccount> {
   List<String> therapistIds = [];
   Map<String, String?> selectedTherapists = {};
 
- @override
+
+  @override
   void initState() {
     super.initState();
     fetchTherapistNames();
@@ -43,6 +44,30 @@ class _ManageAccountState extends State<ManageAccount> {
     for (final patientDoc in patientDocs.docs) {
       final patientId = patientDoc.id;
       await checkAndUpdateTherapistData(patientId);
+      await updateTherapistNameForPatient(patientId);
+    }
+  }
+  Future<void> updateTherapistNameForPatient(String patientId) async {
+    final patientDocRef = FirebaseFirestore.instance.collection('users').doc(patientId);
+
+    final patientDocSnapshot = await patientDocRef.get();
+    final patientData = patientDocSnapshot.data();
+    final therapistId = patientData?['therapistId'] as String?;
+
+    if (therapistId != null) {
+      final therapistExists = await isTherapistExists(therapistId);
+      if (therapistExists) {
+        final therapistData = await getTherapistData(therapistId);
+        final therapistFirstName = therapistData?['firstName'] as String?;
+        final therapistLastName = therapistData?['lastName'] as String?;
+        final therapistFullName = '$therapistFirstName $therapistLastName';
+
+        await updateTherapistName(
+          therapistId: therapistId,
+          docId: patientId,
+          therapistName: therapistFullName,
+        );
+      }
     }
   }
 
@@ -64,7 +89,22 @@ class _ManageAccountState extends State<ManageAccount> {
       }
     }
   }
+  Future<Map<String, dynamic>?> getTherapistData(String therapistId) async {
+    final therapistDocs = await FirebaseFirestore.instance
+        .collection('users')
+        .where('userId', isEqualTo: therapistId)
+        .limit(1)
+        .get();
 
+    final therapistDoc = therapistDocs.docs.isNotEmpty ? therapistDocs.docs.first : null;
+
+    if (therapistDoc != null) {
+      final therapistData = therapistDoc.data();
+      return therapistData;
+    } else {
+      return null;
+    }
+  }
   Future<bool> isTherapistExists(String therapistId) async {
     final therapistDocSnapshot = await FirebaseFirestore.instance
         .collection('users')
