@@ -28,10 +28,51 @@ class _ManageAccountState extends State<ManageAccount> {
   List<String> therapistIds = [];
   Map<String, String?> selectedTherapists = {};
 
-  @override
+ @override
   void initState() {
     super.initState();
     fetchTherapistNames();
+    checkAndUpdateTherapistDataForAllPatients();
+  }
+  Future<void> checkAndUpdateTherapistDataForAllPatients() async {
+    final patientDocs = await FirebaseFirestore.instance
+        .collection('users')
+        .where('type', isEqualTo: 'patient')
+        .get();
+
+    for (final patientDoc in patientDocs.docs) {
+      final patientId = patientDoc.id;
+      await checkAndUpdateTherapistData(patientId);
+    }
+  }
+
+  Future<void> checkAndUpdateTherapistData(String patientId) async {
+    final patientDocRef = FirebaseFirestore.instance.collection('users').doc(patientId);
+
+    final patientDocSnapshot = await patientDocRef.get();
+    final patientData = patientDocSnapshot.data();
+    final therapistId = patientData?['therapistId'] as String?;
+
+    if (therapistId != null) {
+      final therapistExists = await isTherapistExists(therapistId);
+      if (!therapistExists) {
+        await updateTherapistName(
+          therapistId: 'undefined',
+          docId: patientId,
+          therapistName: 'undefined',
+        );
+      }
+    }
+  }
+
+  Future<bool> isTherapistExists(String therapistId) async {
+    final therapistDocSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('userId', isEqualTo: therapistId)
+        .limit(1)
+        .get();
+
+    return therapistDocSnapshot.docs.isNotEmpty;
   }
   //======================= fetch Therapist Names from the firestore ======================================
   Future<void> fetchTherapistNames() async {
@@ -101,7 +142,7 @@ class _ManageAccountState extends State<ManageAccount> {
         height: 118.h,
        width: double.maxFinite,
        child: Card(
-        elevation: 7,
+        elevation: 5,
         child: Center(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 1.h),
