@@ -98,11 +98,13 @@ class _ManageAccountState extends State<ManageAccount> {
        return Padding(
          padding: EdgeInsets.symmetric(vertical: 5.h),
        child: SizedBox(
-        height: 100.h,
+        height: 118.h,
        width: double.maxFinite,
-       child: Center(
+       child: Card(
+        elevation: 7,
+        child: Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.w),
+          padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 1.h),
           child: Column(
              children: [
                ListTile(
@@ -121,40 +123,50 @@ class _ManageAccountState extends State<ManageAccount> {
 
 
       //======================= AppDropList configuration ======================================
-         AppDropList(
-          listItem: therapistNames,
 
-           validator: (v) {
-             if (v == null) {
-              return AppMessage.mandatoryTx;
-               } else {
-                return null;
-                            }},
-           onChanged: (selectedItem) async {
-           setState(() {
-            selectedTherapists[patientId] = selectedItem!;});
-              String result = await updateTherapistName(
-              docId: patientId,
-              therapistId: therapistIds[therapistNames.indexOf(selectedItem!)],
-              therapistName:selectedItem!,);
-                   if (result == 'done') {
-                     print('Therapist ID updated successfully');
-                 } else {
-                    print('Error updating therapist ID');}},
+                  Expanded(
+                   child: SingleChildScrollView(
+                     child: AppDropList(
+                       listItem: therapistNames,
+                       validator: (v) {
+                         if (v == null) {
+                           return AppMessage.mandatoryTx;
+                         } else {
+                           return null;
+                         }
+                       },
 
-          hintText: 'Therapists list',
-         dropValue: selectedTherapists[patientId],
+                       onChanged: (selectedItem) async {
+                         setState(() {
+                           selectedTherapists[patientId] = selectedItem!;
+                         });
+                         String result = await updateTherapistName(
+                           docId: patientId,
+                           therapistId: therapistIds[therapistNames.indexOf(selectedItem!)],
+                           therapistName: selectedItem!,
+                         );
+                         if (result == 'done') {
+                           print('Therapist ID updated successfully');
+                         } else {
+                           print('Error updating therapist ID');
+                         }
+                       },
+                       hintText: 'Therapists list',
+                       dropValue: selectedTherapists[patientId],
+                     ),
+                   ),
+                 ),
+          ],
+             ),
+           ),
+         ),
+       )));
 
-    ),
-    ],
-    ),
-    ),
-    ),
-    ),
-      ));
+
       },
     );
   }
+
 
 
 
