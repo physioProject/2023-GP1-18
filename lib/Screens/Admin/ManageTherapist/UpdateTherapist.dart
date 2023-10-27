@@ -157,6 +157,7 @@ int? patientCount;
                       lastName: lastNameController.text,
                       phone: phoneController.text,
                       docId: widget.docId,
+                      therapistId:widget.userId,
                     ).then((v) {
                       
                       if (v == "done") {
