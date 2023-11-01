@@ -6,15 +6,25 @@ class AppMessage {
   static String invalidPassword = 'Password must be at least 6 digits';
   static String invalidPhone = 'Invalid phone number';
   static String loginTx = 'Logging';
+  static String acountIsDesabled='the acount is disabled';
+  static String PatientList='Patients List';
+  static String PatientInfo='Patient';
+  static String PatientPlan='Customized Plan';
+  static String PatientReport='Report';
+
+  static String Addingexercise='Adding exercise';
   static String singUpTx = 'Sign Up';
   static String noHaveAccountTx = 'No have Account?';
   static String firstName = 'First Name';
   static String lastName = 'Last Name';
   static String age = 'Age';
   static String condition = 'Medical condition';
+  static String exerciseList = 'Exercise List';
   static String therapist = 'Therapist Name';
   static String noPatient = 'Number of Patients';
   static String type = 'Authorization';
+  static String finishDate = 'End Date';
+  static String startDate = 'Start Date';
   static String emailTx = 'Email';
   static String passwordTx = 'Password';
   static String phoneTx = 'Phone Number';
