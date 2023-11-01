@@ -8,7 +8,7 @@ import '../../Widget/AppMessage.dart';
 import '../../Widget/AppRoutes.dart';
 import '../Account/Login.dart';
 
-import 'package:physio/Screens/Therapist/ViewPatient.dart';
+import 'package:physio/Screens/Therapist/ViewPatients.dart';
 import 'package:physio/Screens/Therapist/ViewPatientInfo.dart';
 import 'package:physio/Screens/Therapist/ViewPatientPlan.dart';
 import 'package:physio/Screens/Therapist/ViewPatientReport.dart';
