@@ -291,5 +291,37 @@ class Database {
       return 'done';
     } catch (e) {
       return 'error';
-    }}}
+    }}
+  //=======================AddNewExercise ======================================
+  static Future<String> AddNewExercise({
+    required String exercise,
+required String startDate,
+    required String finishDate,
+    required String userId
+
+    }) async {
+    try {
+
+    {
+        await AppConstants.exerciseCollection.add({
+          'exercise': exercise,
+          'finishDate':finishDate,
+          'startDate':startDate,
+         'userId':userId,
+
+
+        });
+        return 'done';
+      }
+    } on FirebaseException catch (e) {
+
+
+    } catch (e) {
+      return e.toString();
+    }
+    return 'error';
+  }
+
+}
+
 
