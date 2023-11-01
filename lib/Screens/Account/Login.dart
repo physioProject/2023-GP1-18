@@ -17,7 +17,7 @@ import '../../Widget/AppMessage.dart';
 import '../../Widget/AppTextFields.dart';
 import '../../Widget/AppValidator.dart';
 import '../Patient/PatientHome.dart';
-import '../Therapist/TherapistHome.dart';
+import '../Therapist/ViewPatients.dart';
 
 
 class Login extends StatefulWidget {
