@@ -173,11 +173,14 @@ class _LoginState extends State<Login> {
                                     AppConstants.typeIsPatient) {
                                   AppRoutes.pushReplacementTo(
                                       context, const PatientHome());
-                                } else if (element.data()['type'] ==
-                                    AppConstants.typeIsTherapist) {
-                                  AppRoutes.pushReplacementTo(
-                                      context, const TherapistHome());
-                                } else {
+                                } else if (element.data()['type'] == AppConstants.typeIsTherapist) {
+                                  if (selectedType == AppConstants.typeIsTherapist) {
+                                  String therapistId = element.data()['userId'];
+                                     AppRoutes.pushReplacementTo(
+                                  context, ViewPatients(therapistId: therapistId));
+                                 } else {
+                           AppRoutes.pushReplacementTo(context, const ViewPatients(therapistId:''));
+                                  }  }else {
                                   AppRoutes.pushReplacementTo(
                                       context, const AdminHome());
                                 }
