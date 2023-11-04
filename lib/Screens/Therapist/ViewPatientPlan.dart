@@ -71,26 +71,8 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
                 child: ListTile(
 
                   tileColor: AppColor.white,
-                  leading: InkWell(
-//active account function==================================================================================================
+                 
 
-
-
-                    child: Icon(
-                      AppIcons.profile,
-                      size: 45.spMin,
-                      color: data['status'] == 0
-                          ? AppColor.black
-                          : null,
-                    ),
-                  ),
-//active account text==================================================================================================
-                  subtitle: AppText(
-                    text: data['status'] == 0
-                        ? AppMessage.accountNotActive
-                        : '',
-                    fontSize: AppSize.subTextSize,
-                  ),
 //delete icon==================================================================================================
                   trailing: InkWell(
 
