@@ -212,7 +212,6 @@ startDate:startDateController.text,
             ).then((v) {
               if (v == "done") {
                 Navigator.pop(context);
-                Navigator.pop(context);
                 AppLoading.show(context, AppMessage.add, AppMessage.done);
 
               } else {
