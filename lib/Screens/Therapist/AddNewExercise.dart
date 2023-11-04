@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:physio/Screens/Therapist/ViewPatientPlan.dart';
+import 'package:physio/Widget/AppTextFields.dart';
 import '../../../Widget/AppBar.dart';
 import '../../../Database/Database.dart';
 import '../../../Widget/AppMessage.dart';
@@ -24,14 +26,25 @@ class _AddNewExerciseState extends State<AddNewExercise> {
   String? selectedExercise;
   TextEditingController startDateController = TextEditingController();
   TextEditingController finishDateController = TextEditingController();
+  TextEditingController durationController = TextEditingController();
 
   @override
   void dispose() {
     startDateController.dispose();
     finishDateController.dispose();
+    durationController.dispose();
     super.dispose();
   }
-
+  void calculateDuration() {
+    if (startDateController.text.isNotEmpty && finishDateController.text.isNotEmpty) {
+      DateTime startDate = DateTime.parse(startDateController.text);
+      DateTime finishDate = DateTime.parse(finishDateController.text);
+      Duration duration = finishDate.difference(startDate);
+      durationController.text = duration.inDays.toString();
+    } else {
+      durationController.text = '';
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,27 +59,38 @@ class _AddNewExerciseState extends State<AddNewExercise> {
                 height: 20.h,
               ),
 
-              TextFormField(
+              AppTextFields(
                 controller: startDateController,
-                readOnly: true,
+
                 onTap: () {
                   showDatePicker(
                     context: context,
                     initialDate: DateTime.now(),
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2100),
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                        data: ThemeData(
+
+                          colorScheme: ColorScheme.light().copyWith(
+                            primary: Colors.black,
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
                   ).then((selectedDate) {
                     if (selectedDate != null) {
                       setState(() {
                         startDateController.text =
                             DateFormat('yyyy-MM-dd').format(selectedDate);
+                        calculateDuration();
                       });
                     }
                   });
                 },
-                decoration: InputDecoration(
-                  hintText: AppMessage.startDate,
-                ),
+                labelText: AppMessage.startDate,
+
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return AppMessage.mandatoryTx;
@@ -85,27 +109,38 @@ class _AddNewExerciseState extends State<AddNewExercise> {
               SizedBox(
                 height: 10.h,
               ),
-              TextFormField(
+              AppTextFields(
                 controller: finishDateController,
-                readOnly: true,
+
                 onTap: () {
                   showDatePicker(
                     context: context,
                     initialDate: DateTime.now(),
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2100),
-                  ).then((selectedDate) {
+    builder: (BuildContext context, Widget? child) {
+      return Theme(
+        data: ThemeData(
+
+          colorScheme: ColorScheme.light().copyWith(
+            primary: Colors.black,
+          ),
+        ),
+        child: child!,
+      );
+    } ).then((selectedDate) {
                     if (selectedDate != null) {
                       setState(() {
                         finishDateController.text =
                             DateFormat('yyyy-MM-dd').format(selectedDate);
+                        calculateDuration();
                       });
                     }
                   });
                 },
-                decoration: InputDecoration(
-                  hintText: AppMessage.finishDate,
-                ),
+
+                labelText: AppMessage.finishDate,
+
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return AppMessage.mandatoryTx;
@@ -124,6 +159,22 @@ class _AddNewExerciseState extends State<AddNewExercise> {
               SizedBox(
                 height: 10.h,
               ),
+    AppTextFields(
+      validator: (v) {
+        if (v == null) {
+          return AppMessage.mandatoryTx;
+        } else {
+          return null;
+        }
+      },
+
+      obscureText: false,
+      enable:false,
+
+     controller: durationController, labelText: '${AppMessage.duration} days')
+         , SizedBox(
+          height: 10.h,
+        ),
     AppDropList(
     listItem: AppConstants.ExerciseList,
     validator: (v) {
@@ -156,12 +207,14 @@ class _AddNewExerciseState extends State<AddNewExercise> {
               exercise: selectedExercise!,
 startDate:startDateController.text,
               finishDate: finishDateController.text,
+              duration:durationController.text,
               userId:widget.PatientId
             ).then((v) {
               if (v == "done") {
                 Navigator.pop(context);
                 Navigator.pop(context);
                 AppLoading.show(context, AppMessage.add, AppMessage.done);
+
               } else {
                 Navigator.pop(context);
                 AppLoading.show(context, AppMessage.add, AppMessage.error);
@@ -177,3 +230,4 @@ startDate:startDateController.text,
         );
        }
      }
+
