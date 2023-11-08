@@ -292,12 +292,13 @@ class Database {
     } catch (e) {
       return 'error';
     }}
-  //=======================AddNewExercise ======================================
+ //=======================AddNewExercise ======================================
   static Future<String> AddNewExercise({
     required String exercise,
 required String startDate,
     required String finishDate,
-    required String userId
+    required String userId,
+    required String duration
 
     }) async {
     try {
@@ -308,7 +309,7 @@ required String startDate,
           'finishDate':finishDate,
           'startDate':startDate,
          'userId':userId,
-
+         'duration':duration,
 
         });
         return 'done';
