@@ -11,7 +11,8 @@ class AppMessage {
   static String PatientInfo='Patient';
   static String PatientPlan='Customized Plan';
   static String PatientReport='Report';
-
+  static String duration='Duration';
+  static String fullName='Full Name';
   static String Addingexercise='Adding exercise';
   static String singUpTx = 'Sign Up';
   static String noHaveAccountTx = 'No have Account?';
