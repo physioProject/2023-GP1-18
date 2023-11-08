@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:physio/Widget/AppIcons.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-
-import 'package:flutter/gestures.dart';
-
+import 'package:physio/Widget/AppColor.dart';
 import '../../../Widget/AppBar.dart';
-import '../../../Widget/AppText.dart';
 import '../../../Widget/AppMessage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../Widget/AppImage.dart';
+import '../../Widget/AppTextFields.dart';
+import '../../Widget/AppValidator.dart';
 
 class ViewPatientInfo extends StatefulWidget {
   final String PatientId;
@@ -22,11 +20,16 @@ class ViewPatientInfo extends StatefulWidget {
   String patientCondition = '';
   String patientEmail = '';
   String age = '';
-
+  late ImageProvider profileImg;
+  TextEditingController nameController = TextEditingController();
+  TextEditingController  ageController= TextEditingController();
+  TextEditingController conditionController= TextEditingController();
+  TextEditingController emailController= TextEditingController();
   @override
   void initState() {
     super.initState();
     fetchPatientData();
+    profileImg = AssetImage(AppImage.profile);
   }
 
   Future<void> fetchPatientData() async {
@@ -41,6 +44,10 @@ class ViewPatientInfo extends StatefulWidget {
       age = document['age'].toString();
       patientCondition = document['condition'];
       patientEmail = document['email'];
+      nameController.text=patientName;
+      ageController.text=age;
+      conditionController.text=patientCondition;
+      emailController.text=patientEmail;
     });
   }
 
@@ -59,96 +66,84 @@ class ViewPatientInfo extends StatefulWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarWidget(text: AppMessage.PatientInfo),
+
       body: Center(
-        child: Card(
-          color: Colors.white,
+
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: MediaQuery
                   .of(context)
                   .size
-                  .width * 0.1, 
-              vertical: MediaQuery
-                  .of(context)
-                  .size
-                  .height * 0.3,
+                  .width * 0.1,
+
             ),
             child: ListView(
-              children: [
-                Row(
-                  children: [
-                    const AppText(
-                      text: 'Name: ',
-                      fontSize: 20,
-                    ),
-                    Icon(AppIcons.name),
-                    AppText(
-                      text: '$patientName',
-                      fontSize: 20,
-                    ),
-                  ],
+              children: [CircleAvatar(
+                radius: 100.sp,
+                child: ClipOval(
+                  child: Image(
+                    image: profileImg,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                Row(
-                  children: [
-                    AppText(
-                      text: 'Age: ',
-                      fontSize: 20,
-                    ),
-                    Icon(AppIcons.calendar),
-                    AppText(
-                      text: '$age',
-                      fontSize: 20,
-                    ),
-                  ],
+              ),
+                SizedBox(
+                  height: 40.h,
                 ),
-                Row(
-                  children: [
-                    const AppText(
-                      text: 'Condition: ',
-                      fontSize: 20,
-                    ),
-                    Icon(AppIcons.condition),
-                    AppText(
-                      text: '$patientCondition',
-                      fontSize: 20,
-                    ),
-                  ],
+                AppTextFields(
+                  controller: nameController,
+                  labelText: AppMessage.fullName,
+                  validator: (v) => AppValidator.validatorName(v),
+                  obscureText: false,
+                  enable: false,
+
                 ),
-                Row(
-                  children: [
-                    const AppText(
-                      text: 'Email: ',
-                      fontSize: 20,
-                    ),
-                    InkWell(
-                      onTap: openEmail,
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            WidgetSpan(
-                              child: Icon(AppIcons.email),
-                            ),
-                            TextSpan(
-                              text: '$patientEmail',
-                              style: TextStyle(
-                                fontSize: 20,
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = openEmail,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+
+                SizedBox(
+                  height: 10.h,
                 ),
+                AppTextFields(
+                  controller: ageController,
+                  labelText: AppMessage.age,
+                  validator: (v) => AppValidator.validatorEmpty(v),
+                  obscureText: false,
+                  enable: false,
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+
+                AppTextFields(
+                  controller: conditionController,
+                  labelText: AppMessage.condition,
+                  validator: (v) => AppValidator.validatorEmpty(v),
+                  obscureText: false,
+                  enable: false,
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+            InkWell(
+              onTap: openEmail,
+                child: AppTextFields(
+                  controller: emailController,
+
+                  labelText: AppMessage.emailTx,
+                  validator: (v) => AppValidator.validatorEmail(v),
+                  obscureText: false,
+                  enable: false,
+                ),),
+                SizedBox(
+                  height: 10.h,
+                ),
+
               ],
             ),
           ),
-        ),
+
       ),
     );
   }
+
 }
+
