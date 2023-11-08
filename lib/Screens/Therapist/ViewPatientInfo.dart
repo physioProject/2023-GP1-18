@@ -50,7 +50,7 @@ class ViewPatientInfo extends StatefulWidget {
       emailController.text=patientEmail;
     });
   }
-
+//==============================open email===============================================================
   void openEmail() async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
@@ -89,7 +89,9 @@ class ViewPatientInfo extends StatefulWidget {
               ),
                 SizedBox(
                   height: 40.h,
-                ),
+                ), 
+                
+   //==============================full name===============================================================
                 AppTextFields(
                   controller: nameController,
                   labelText: AppMessage.fullName,
@@ -102,6 +104,7 @@ class ViewPatientInfo extends StatefulWidget {
                 SizedBox(
                   height: 10.h,
                 ),
+//==============================age===============================================================
                 AppTextFields(
                   controller: ageController,
                   labelText: AppMessage.age,
@@ -112,7 +115,7 @@ class ViewPatientInfo extends StatefulWidget {
                 SizedBox(
                   height: 10.h,
                 ),
-
+//==============================condition===============================================================
                 AppTextFields(
                   controller: conditionController,
                   labelText: AppMessage.condition,
@@ -123,6 +126,7 @@ class ViewPatientInfo extends StatefulWidget {
                 SizedBox(
                   height: 10.h,
                 ),
+//==============================email===============================================================
             InkWell(
               onTap: openEmail,
                 child: AppTextFields(
@@ -146,4 +150,3 @@ class ViewPatientInfo extends StatefulWidget {
   }
 
 }
-
