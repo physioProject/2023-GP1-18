@@ -30,16 +30,7 @@ class _ViewTherapistState extends State<ViewPatients> {
     return Scaffold(
       appBar: AppBarWidget(
         text: AppMessage.PatientList,
-        leading: AppPopUpMen(
-          icon: CircleAvatar(
-            backgroundColor: AppColor.black,
-            child: Icon(AppIcons.menu),
-          ),
-          menuList: AppWidget.itemList(action: () {
-            Database.logOut();
-            AppRoutes.pushReplacementTo(context, const Login());
-          }),
-        ),
+
       ),
       body: StreamBuilder(
         stream: AppConstants.userCollection
