@@ -21,12 +21,12 @@ class AppConstants {
     'Shoulder recurrent dislocation'
   ];
   static List<String> ExerciseList = [
-    'ex1 level1',
-    'ex1 level2',
-    'ex2 level1',
-    'ex2 level2',
-    'ex3 level1',
-    'ex3 level2'
+    'Shoulder front raise level1',
+    'Shoulder front raise level2',
+    'Shoulder side raise level1',
+    'Shoulder side raise level2',
+    'Shoulder external rotation level1',
+    'Shoulder external rotation level2'
   ];
   static List<String> typeMenu = ['admin', 'patient', 'therapist'];
 }
