@@ -1,14 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../../../Widget/AppBar.dart';
-
 import '../../../Widget/AppMessage.dart';
-import '../../Database/Database.dart';
 import '../../Widget/AppColor.dart';
 import '../../Widget/AppConstants.dart';
 import '../../Widget/AppIcons.dart';
-import '../../Widget/AppLoading.dart';
 import '../../Widget/AppRoutes.dart';
 import 'package:physio/Screens/Therapist/AddNewExercise.dart';
 
@@ -21,37 +18,38 @@ class ViewPatientPlan extends StatefulWidget {
 
   @override
   State<ViewPatientPlan> createState() => _ViewPatientPlanState();
-}
-
-class _ViewPatientPlanState extends State<ViewPatientPlan> {
+}class _ViewPatientPlanState extends State<ViewPatientPlan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBarWidget(text: AppMessage.PatientPlan),
-        floatingActionButton: FloatingActionButton(
-            backgroundColor: AppColor.iconColor,
-            elevation: 10,
-            child: Icon(AppIcons.add),
-          onPressed: () {
-            AppRoutes.pushTo(context, AddNewExercise(PatientId: widget.PatientId));
-          },),
-        body: StreamBuilder(
-            stream: AppConstants.exerciseCollection
-                .where('userId', isEqualTo:widget.PatientId)
-
-                .snapshots(),
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.hasError) {
-                return Center(child: Text('${snapshot.error}'));
-              }
-              if (snapshot.hasData) {
-                return body(context, snapshot);
-              }
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }));
+      appBar: AppBarWidget(text: AppMessage.PatientPlan),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColor.iconColor,
+        elevation: 10,
+        child: Icon(AppIcons.add),
+        onPressed: () {
+          AppRoutes.pushTo(context, AddNewExercise(PatientId: widget.PatientId));
+        },
+      ),
+      body: StreamBuilder(
+        stream: AppConstants.exerciseCollection
+            .where('userId', isEqualTo: widget.PatientId)
+            .where('finishDate', isGreaterThan: DateTime.now())
+            .orderBy('finishDate')
+            .snapshots(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text('${snapshot.error}'));
+            }
+            if (snapshot.hasData) {
+              return body(context, snapshot);
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }));
   }
+
 
 //=======================================================================
   Widget body(context, snapshot) {
@@ -71,12 +69,12 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
                 child: ListTile(
 
                   tileColor: AppColor.white,
-                 
+
 
 //delete icon==================================================================================================
                   trailing: InkWell(
 
-                      //write delete code her
+                    //write delete code her
 
                     child: Icon(
                       AppIcons.delete,
