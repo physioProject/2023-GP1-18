@@ -34,7 +34,7 @@ class ViewPatientPlan extends StatefulWidget {
       body: StreamBuilder(
         stream: AppConstants.exerciseCollection
             .where('userId', isEqualTo: widget.PatientId)
-            .where('finishDate', isGreaterThan: DateTime.now())
+            .where('finishDate', isGreaterThan: DateTime.now().toString())
             .orderBy('finishDate')
             .snapshots(),
           builder: (context, AsyncSnapshot snapshot) {
