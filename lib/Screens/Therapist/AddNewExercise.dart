@@ -110,33 +110,38 @@ class _AddNewExerciseState extends State<AddNewExercise> {
                 height: 10.h,
               ),
               AppTextFields(
-                controller: finishDateController,
-
-                onTap: () {
-                  showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
+    controller: finishDateController,
+    onTap: () {
+    showDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime.now(),
+    lastDate: DateTime(2100),
     builder: (BuildContext context, Widget? child) {
-      return Theme(
-        data: ThemeData(
-
-          colorScheme: ColorScheme.light().copyWith(
-            primary: Colors.black,
-          ),
-        ),
-        child: child!,
-      );
-    } ).then((selectedDate) {
-                    if (selectedDate != null) {
+    return Theme(
+    data: ThemeData(
+    colorScheme: ColorScheme.light().copyWith(
+    primary: Colors.black,
+    ),
+    ),
+    child: child!,
+    );
+    },
+    ).then((selectedDate) {
+    if (selectedDate != null) {
+    DateTime selectedEndDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    DateTime currentDateTime = DateTime.now();
+    DateTime currentDate = DateTime(currentDateTime.year, currentDateTime.month, currentDateTime.day);
+    if (selectedEndDate.isBefore(currentDate)) {
+      return 'Finish date must be after current date';
+    } else {
                       setState(() {
                         finishDateController.text =
                             DateFormat('yyyy-MM-dd').format(selectedDate);
                         calculateDuration();
                       });
                     }
-                  });
+                  }});
                 },
 
                 labelText: AppMessage.finishDate,
