@@ -142,6 +142,8 @@ class _ViewPatientState extends State<ViewPatient> {
                             //write delete code her
                             await Database.deleteAccount(context,
                               docId: snapshot.data.docs[i].id,
+                              userId:data['userId'],
+                              type:data['type'],
                             );
                             debugPrint('delete code');
                           },

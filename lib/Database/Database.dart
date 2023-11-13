@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class Database {
           'firstName': firstName,
           'lastName': lastName,
           'userId': userCredential.user?.uid,
-          'password': password,
+
           'email': email,
           'age': age,
           'phone': phone,
@@ -72,7 +73,7 @@ class Database {
           'firstName': firstName,
           'lastName': lastName,
           'userId': userCredential.user?.uid,
-          'password': password,
+
           'email': email,
           'phone': phone,
           'type': 'therapist',
@@ -151,8 +152,20 @@ class Database {
     required String lastName,
     required String phone,
     required String docId,
+    required String therapistId,
   }) async {
-    try {
+    try { final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('therapistId', isEqualTo: therapistId)
+        .get();
+    querySnapshot.docs.forEach((doc) async {
+      final userId = doc.id;
+      await updateTherapistName(
+        docId: userId,
+        therapistId: therapistId,
+        therapistName: '$firstName $lastName',
+      );
+    });
       await AppConstants.userCollection.doc(docId).update({
         'firstName': firstName,
         'lastName': lastName,
@@ -199,52 +212,117 @@ class Database {
       return 'error';
     }
   }
-
+  
   //==============================LogOut from google account=================================================
   static Future singOutFromGoogleAccount() {
     return _googleSignIn.signOut();
   }
 
+
+
   //=======================delete account======================================
 
-  static deleteAccount(BuildContext context,{required String docId}) async {
+  static deleteAccount(BuildContext context, {required String docId, required String userId, required String type}) async {
     try {
-      showDialog(context: context, builder:(BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete User'),
-          content: const Text(
-            "Are you sure you want to delete the user",
-          ),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
+
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Delete User'),
+              content: const Text(
+                "Are you sure you want to delete the user",
               ),
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Delete'),
-              onPressed: () async {
-                await AppConstants.userCollection.doc(docId).delete();
-                await FirebaseAuth.instance.currentUser!.delete();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  child: const Text('Delete'),
+                  onPressed: () async {
+                    await AppConstants.userCollection.doc(docId).delete();
+//=======================update therapistName ======================================
+            if (type == 'therapist' ) {
+            final querySnapshot = await FirebaseFirestore.instance
+                .collection('users')
+                .where('therapistId', isEqualTo: userId)
+                .get();
+                    querySnapshot.docs.forEach((doc) async {
+                      final userId = doc.id;
+                      await updateTherapistName(
+                        docId: userId,
+                        therapistId: 'undefined',
+                        therapistName: 'undefined',
+                      );
+                    });}
+
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
         );
-      },);
+
+    } catch (e) {
+    }
+  }
+  //=======================update the Therapist Name for specific patient ======================================
+  static Future<String> updateTherapistName({
+    required String therapistId,
+    required String docId,
+    required String therapistName,}) async {
+    try {
+      await AppConstants.userCollection.doc(docId).update({
+        'therapistId': therapistId,
+
+        'therapistName':therapistName,
+      });
+      return 'done';
+    } catch (e) {
+      return 'error';
+    }}
+ //=======================AddNewExercise ======================================
+  static Future<String> AddNewExercise({
+    required String exercise,
+required String startDate,
+    required String finishDate,
+    required String userId,
+    required String duration
+
+    }) async {
+    try {
+
+    {
+        await AppConstants.exerciseCollection.add({
+          'exercise': exercise,
+          'finishDate':finishDate,
+          'startDate':startDate,
+         'userId':userId,
+         'duration':duration,
+
+        });
+        return 'done';
+      }
+    } on FirebaseException catch (e) {
 
 
     } catch (e) {
-
+      return e.toString();
     }
+    return 'error';
   }
 
-
 }
+
+

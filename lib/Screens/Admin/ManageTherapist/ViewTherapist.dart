@@ -136,6 +136,8 @@ class _ViewTherapistState extends State<ViewTherapist> {
                           onTap: () async {
                             await Database.deleteAccount(context,
                               docId: snapshot.data.docs[i].id,
+                              userId:data['userId'],
+                                type:data['type'],
                             );
                             debugPrint('delete code');
                           },

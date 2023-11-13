@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppIcons {
 
+  
   static IconData logout =Icons.logout_rounded;
   static IconData close =Icons.close;
   static IconData managePatient =Icons.personal_injury;
@@ -11,6 +12,16 @@ class AppIcons {
   static IconData add =Icons.add;
   static IconData delete =Icons.delete;
   static IconData menu =Icons.menu;
+  static IconData report=Icons.bar_chart_outlined;
+  static IconData patientPlan=Icons.ballot_outlined;
+  static IconData exercise=Icons.sports_gymnastics;
+  static IconData calendar=Icons.calendar_month;
+  static IconData email=Icons.email;
+  static IconData phoneNo=Icons.add_call;
+  static IconData name=Icons.account_box;
+  static IconData condition=Icons.airline_seat_flat;
+
+
 
 
 }

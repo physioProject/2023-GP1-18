@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AppConstants {
   static CollectionReference userCollection =
       FirebaseFirestore.instance.collection('users');
+  static CollectionReference exerciseCollection =
+  FirebaseFirestore.instance.collection('exercises');
 
   static String typeIsTherapist = 'therapist';
   static String typeIsPatient = 'patient';
@@ -17,6 +19,14 @@ class AppConstants {
     'Carpel tunnel',
     'Shoulder impingement syndrome',
     'Shoulder recurrent dislocation'
+  ];
+  static List<String> ExerciseList = [
+    'Shoulder front raise level1',
+    'Shoulder front raise level2',
+    'Shoulder side raise level1',
+    'Shoulder side raise level2',
+    'Shoulder external rotation level1',
+    'Shoulder external rotation level2'
   ];
   static List<String> typeMenu = ['admin', 'patient', 'therapist'];
 }
