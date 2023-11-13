@@ -41,6 +41,7 @@ class _ManageAccountState extends State<ManageAccount> {
     final querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('type', isEqualTo: 'therapist')
+       .where('activeUser', isEqualTo: true)
         .get();
     setState(() {
       therapistNames = querySnapshot.docs
@@ -72,6 +73,7 @@ class _ManageAccountState extends State<ManageAccount> {
       body: StreamBuilder<QuerySnapshot>(
         stream: AppConstants.userCollection
             .where('type', isEqualTo: AppConstants.typeIsPatient)
+         .where('activeUser', isEqualTo: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
