@@ -188,10 +188,12 @@ class _LoginState extends State<Login> {
                                     String therapistId =
                                     element.data()['userId'];
                                     AppRoutes.pushReplacementTo(context,
-                                        ViewPatients(therapistId: therapistId));
+                                        ViewPatients(therapistId: therapistId, name: element.data()['firstName'] +
+                                            ' ' +
+                                            element.data()['lastName'],));
                                   } else {
                                     AppRoutes.pushReplacementTo(context,
-                                        const ViewPatients(therapistId: ''));
+                                         ViewPatients(therapistId: '',name: element.data()['firstName'] + ' ' + element.data()['lastName'],));
                                   }
                                 } else {
                                   AppRoutes.pushReplacementTo(

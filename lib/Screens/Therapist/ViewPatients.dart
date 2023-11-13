@@ -15,10 +15,12 @@ import '../../../Widget/generalWidget.dart';
 import 'package:physio/Screens/Account/Login.dart';
 import 'package:physio/Screens/Therapist/TherapistHome.dart';
 
+import '../Patient/ChangePass.dart';
+
 class ViewPatients extends StatefulWidget {
   final String therapistId;
-
-  const ViewPatients({Key? key, required this.therapistId}) : super(key: key);
+  final String name;
+   ViewPatients({Key? key, required this.therapistId, required this.name}) : super(key: key);
 
   @override
   State<ViewPatients> createState() => _ViewTherapistState();
@@ -29,9 +31,21 @@ class _ViewTherapistState extends State<ViewPatients> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarWidget(
-        text: AppMessage.PatientList,
-
-      ),
+          text: AppMessage.PatientList,
+          leading: AppPopUpMen(
+              icon: CircleAvatar(
+                backgroundColor: AppColor.black,
+                child: Icon(AppIcons.menu),
+              ),
+              menuList: AppWidget.itemList(
+                  onTapChangePass: () =>
+                      AppRoutes.pushTo(context, const ChangePass()),
+                  isChangePassword: true,
+                  helloName: 'Hello Therapist ${widget.name}',
+                  action: () {
+                    Database.logOut();
+                    AppRoutes.pushReplacementTo(context, const Login());
+                  }))),
       body: StreamBuilder(
         stream: AppConstants.userCollection
             .where('type', isEqualTo: AppConstants.typeIsPatient)
