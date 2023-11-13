@@ -142,6 +142,8 @@ class _ViewPatientState extends State<ViewPatient> {
                               Navigator.pop(context);
                               await Database.updateActiveUser(
                                   docId: snapshot.data.docs[i].id,
+                                 userId:data['userId'],
+                                  type:data['type'],
                                   activeUser: false);
                             });
                           },
