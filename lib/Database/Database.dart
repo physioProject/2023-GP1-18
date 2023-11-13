@@ -333,11 +333,30 @@ class Database {
 //=======================Active user======================================
 
   static Future<String> updateActiveUser(
-      {required String docId, required bool activeUser}) async {
+      {required String docId, required bool activeUser,   userId,
+   type}) async {
     try {
       await AppConstants.userCollection.doc(docId).update({
         'activeUser': activeUser,
+
       });
+
+
+//=======================update therapistName ======================================
+      if (type == 'therapist'&& activeUser==false) {
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('therapistId', isEqualTo: userId)
+            .get();
+        querySnapshot.docs.forEach((doc) async {
+          final userId = doc.id;
+          await updateTherapistName(
+            docId: userId,
+            therapistId: 'undefined',
+            therapistName: 'undefined',
+          );
+        });
+      }
       return 'done';
     } catch (e) {
       return 'error';
