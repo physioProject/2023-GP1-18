@@ -71,6 +71,7 @@ int? patientCount;
     final querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('therapistId', isEqualTo: widget.userId)
+       .where('activeUser', isEqualTo: true)
         .get();
     return querySnapshot.docs.length;
   }
