@@ -50,6 +50,7 @@ class _ViewTherapistState extends State<ViewPatients> {
         stream: AppConstants.userCollection
             .where('type', isEqualTo: AppConstants.typeIsPatient)
             .where('therapistId', isEqualTo: widget.therapistId)
+         .where('activeUser', isEqualTo: true)
             .snapshots(),
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.hasError) {
