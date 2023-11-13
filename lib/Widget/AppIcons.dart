@@ -21,7 +21,8 @@ class AppIcons {
   static IconData name=Icons.account_box;
   static IconData condition=Icons.airline_seat_flat;
 
-
+  static IconData active =Icons.toggle_on;
+  static IconData unActive =Icons.toggle_off;
 
 
 }

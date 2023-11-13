@@ -29,7 +29,12 @@ class AppWidget {
   }
 
   //===============================================================================================
-  static List<PopupMenuItem> itemList({required action}) {
+  static List<PopupMenuItem> itemList({
+    required action,
+    bool? isChangePassword,
+    String? helloName,
+    void Function()? onTapChangePass,
+  }) {
     return [
       PopupMenuItem(
         padding: EdgeInsets.zero,
@@ -39,7 +44,7 @@ class AppWidget {
             color: AppColor.white,
           ),
           title: AppText(
-            text: 'Hello Admin',
+            text: helloName ?? 'Hello Admin',
             fontSize: AppSize.subTextSize,
             color: AppColor.white,
           ),
@@ -47,9 +52,45 @@ class AppWidget {
       ),
       PopupMenuItem(
           child: Divider(
-        color: AppColor.white,
-        thickness: 1,
-      )),
+            color: AppColor.white,
+            thickness: 1,
+          )),
+      //====================================
+
+      isChangePassword != null
+          ? PopupMenuItem(
+        padding: EdgeInsets.zero,
+        child: ListTile(
+          onTap: onTapChangePass,
+          leading: Icon(
+            Icons.lock,
+            color: AppColor.white,
+          ),
+          title: AppText(
+            text: 'Change password',
+            fontSize: AppSize.subTextSize,
+            color: AppColor.white,
+          ),
+        ),
+      )
+          : const PopupMenuItem(
+          height: 0,
+          padding: EdgeInsets.zero,
+          child: SizedBox(
+            height: 0,
+          )),
+      isChangePassword != null
+          ? PopupMenuItem(
+          child: Divider(
+            color: AppColor.white,
+            thickness: 1,
+          ))
+          : const PopupMenuItem(
+          height: 0,
+          padding: EdgeInsets.zero,
+          child: SizedBox(
+            height: 0,
+          )),
       //====================================
       PopupMenuItem(
         child: ListTile(
