@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../../Widget/AppBar.dart';
 import '../../../Widget/AppMessage.dart';
 import '../../Widget/AppColor.dart';
@@ -8,17 +9,111 @@ import '../../Widget/AppConstants.dart';
 import '../../Widget/AppIcons.dart';
 import '../../Widget/AppRoutes.dart';
 import 'package:physio/Screens/Therapist/AddNewExercise.dart';
-
 import '../../Widget/AppSize.dart';
 import '../../Widget/AppText.dart';
+import 'package:physio/Screens/Therapist/UpdateExercise.dart';
 
 class ViewPatientPlan extends StatefulWidget {
   final String PatientId;
-  const ViewPatientPlan({Key? key,required this.PatientId}) : super(key: key);
+  const ViewPatientPlan({Key? key, required this.PatientId}) : super(key: key);
 
   @override
   State<ViewPatientPlan> createState() => _ViewPatientPlanState();
-}class _ViewPatientPlanState extends State<ViewPatientPlan> {
+}
+
+class _ViewPatientPlanState extends State<ViewPatientPlan> {
+  Future<void> deleteExercise(String documentId) async {
+    try {
+      await AppConstants.exerciseCollection.doc(documentId).delete();
+      // Optionally, you can add a message or perform other actions after deletion
+    } catch (e) {
+      print('Error deleting exercise: $e');
+    }
+  }
+
+  Future<void> showDeleteConfirmationDialog(String documentId) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure?'),
+          content: Text('Do you want to delete this exercise for this patient?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text('Yes'),
+              onPressed: () {
+                deleteExercise(documentId);
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void navigateToUpdateExercise(String documentId) {
+    AppRoutes.pushTo(context, UpdateExercise(exerciseId: documentId));
+  }
+
+  Widget body(context, snapshot) {
+    return snapshot.data.docs.length > 0
+        ? ListView.builder(
+      itemCount: snapshot.data.docs.length,
+      itemBuilder: (context, i) {
+        var data = snapshot.data.docs[i].data();
+        var documentId = snapshot.data.docs[i].id;
+
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.h),
+          child: SizedBox(
+            height: 100.h,
+            width: double.maxFinite,
+            child: Card(
+              elevation: 5,
+              child: Center(
+                child: ListTile(
+                  tileColor: AppColor.white,
+                  trailing: InkWell(
+                    onTap: () {
+                      showDeleteConfirmationDialog(documentId);
+                    },
+                    child: Icon(
+                      AppIcons.delete,
+                      size: 30.spMin,
+                      color: AppColor.errorColor,
+                    ),
+                  ),
+                  title: InkWell(
+                    onTap: () {
+                      navigateToUpdateExercise(documentId);
+                    },
+                    child: AppText(
+                      text: data['exercise'],
+                      fontSize: AppSize.subTextSize,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    )
+        : Center(
+      child: AppText(
+          text: AppMessage.noData,
+          fontSize: AppSize.subTextSize,
+          fontWeight: FontWeight.bold),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,73 +132,19 @@ class ViewPatientPlan extends StatefulWidget {
             .where('finishDate', isGreaterThan: DateTime.now().toString())
             .orderBy('finishDate')
             .snapshots(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.hasError) {
-              return Center(child: Text('${snapshot.error}'));
-            }
-            if (snapshot.hasData) {
-              return body(context, snapshot);
-            }
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }));
-  }
-
-
-//=======================================================================
-  Widget body(context, snapshot) {
-    return snapshot.data.docs.length > 0
-        ? ListView.builder(
-      itemCount: snapshot.data.docs.length,
-      itemBuilder: (context, i) {
-        var data = snapshot.data.docs[i].data();
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 5.h),
-          child: SizedBox(
-            height: 100.h,
-            width: double.maxFinite,
-            child: Card(
-              elevation: 5,
-              child: Center(
-                child: ListTile(
-
-                  tileColor: AppColor.white,
-
-
-//delete icon==================================================================================================
-                  trailing: InkWell(
-
-                    //write delete code her
-
-                    child: Icon(
-                      AppIcons.delete,
-                      size: 30.spMin,
-                      color: AppColor.errorColor,
-                    ),
-                  ),
-//name icon==================================================================================================
-                  title: AppText(
-                    text: data['exercise'] ,
-                    fontSize: AppSize.subTextSize,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    )
-        : Center(
-      child: AppText(
-          text: AppMessage.noData,
-          fontSize: AppSize.subTextSize,
-          fontWeight: FontWeight.bold),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('${snapshot.error}'));
+          }
+          if (snapshot.hasData) {
+            return body(context, snapshot);
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
     );
   }
 }
-
-
-
-//=========================================
 

@@ -80,7 +80,7 @@ int? patientCount;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget(text: AppMessage.updatePatient),
+      appBar: AppBarWidget(text: AppMessage.updateTherapist),
       body: Form(
         key: updateKey,
         child: Padding(

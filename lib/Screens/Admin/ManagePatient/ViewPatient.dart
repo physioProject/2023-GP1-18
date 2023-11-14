@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:physio/Database/Database.dart';
@@ -81,6 +82,7 @@ class _ViewPatientState extends State<ViewPatient> {
                     child: Center(
                       child: ListTile(
                         onTap: () {
+                          print('Tapped on patient, navigating to UpdatePatient');
                           AppRoutes.pushTo(
                               context,
                               UpdatePatient(
@@ -88,7 +90,7 @@ class _ViewPatientState extends State<ViewPatient> {
                                 firstName: data['firstName'],
                                 lastName: data['lastName'],
                                 phone: data['phone'],
-                                age: data['age'],
+                                dateOfBirth: (data['dateOfBirth'] as Timestamp).toDate() ?? DateTime.now(),
                                 condition: data['condition'],
                                 email: data['email'],
                                 therapistName: data['therapistName'],

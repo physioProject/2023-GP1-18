@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 import '../../../Database/Database.dart';
 import '../../../Widget/AppBar.dart';
@@ -20,22 +21,21 @@ class UpdatePatient extends StatefulWidget {
   final String lastName;
   final String phone;
   final String email;
-  final int age;
+  final DateTime dateOfBirth;
   final String condition;
   final String therapistName;
 
-  const UpdatePatient(
-      {Key? key,
-      required this.docId,
-      required this.firstName,
-      required this.lastName,
-      required this.phone,
-      required this.age,
-      required this.condition,
-        required this.therapistName,
-
-      required this.email})
-      : super(key: key);
+  const UpdatePatient({
+    Key? key,
+    required this.docId,
+    required this.firstName,
+    required this.lastName,
+    required this.phone,
+    required this.dateOfBirth,
+    required this.condition,
+    required this.therapistName,
+    required this.email,
+  }) : super(key: key);
 
   @override
   State<UpdatePatient> createState() => _UpdatePatientState();
@@ -46,20 +46,25 @@ class _UpdatePatientState extends State<UpdatePatient> {
   TextEditingController lastNameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailPathController = TextEditingController();
-  TextEditingController ageController = TextEditingController();
+  TextEditingController dateOfBirthController = TextEditingController();
   TextEditingController therapistNameController = TextEditingController();
   GlobalKey<FormState> updateKey = GlobalKey();
   String? selectedCondition;
+  DateTime? selectedDateOfBirth;
+
+  static const String dateOfBirthLabel = 'Date of Birth';
+
   @override
   void initState() {
-    // TODO: implement initState
+    super.initState();
     firstNameController.text = widget.firstName;
     lastNameController.text = widget.lastName;
-    ageController.text = widget.age.toString();
+    dateOfBirthController.text =
+        DateFormat('yyyy-MM-dd').format(widget.dateOfBirth);
     emailPathController.text = widget.email;
     phoneController.text = widget.phone;
     selectedCondition = widget.condition;
-    therapistNameController.text= widget.therapistName;
+    therapistNameController.text = widget.therapistName;
   }
 
   @override
@@ -69,13 +74,12 @@ class _UpdatePatientState extends State<UpdatePatient> {
       body: Form(
         key: updateKey,
         child: Padding(
-          padding:  EdgeInsets.symmetric(horizontal: 10.w),
+          padding: EdgeInsets.symmetric(horizontal: 10.w),
           child: ListView(
             children: [
               SizedBox(
                 height: 20.h,
               ),
-//==============================first name===============================================================
               AppTextFields(
                 controller: firstNameController,
                 labelText: AppMessage.firstName,
@@ -85,7 +89,6 @@ class _UpdatePatientState extends State<UpdatePatient> {
               SizedBox(
                 height: 10.h,
               ),
-//==============================last name===============================================================
               AppTextFields(
                 controller: lastNameController,
                 labelText: AppMessage.lastName,
@@ -95,7 +98,6 @@ class _UpdatePatientState extends State<UpdatePatient> {
               SizedBox(
                 height: 10.h,
               ),
-//==============================email name===============================================================
               AppTextFields(
                 controller: emailPathController,
                 labelText: AppMessage.emailTx,
@@ -106,33 +108,56 @@ class _UpdatePatientState extends State<UpdatePatient> {
               SizedBox(
                 height: 10.h,
               ),
-//==============================phone number===============================================================
               AppTextFields(
-                  controller: phoneController,
-                  labelText: AppMessage.phoneTx,
-                  validator: (v) => AppValidator.validatorPhone(v),
-                  obscureText: false,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  keyboardType: TextInputType.number),
+                controller: phoneController,
+                labelText: AppMessage.phoneTx,
+                validator: (v) => AppValidator.validatorPhone(v),
+                obscureText: false,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                keyboardType: TextInputType.number,
+              ),
               SizedBox(
                 height: 10.h,
               ),
-//==============================age name===============================================================
               AppTextFields(
-                  controller: ageController,
-                  labelText: AppMessage.age,
-                  validator: (v) => AppValidator.validatorEmpty(v),
-                  obscureText: false,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  keyboardType: TextInputType.number),
+                controller: dateOfBirthController,
+                labelText: dateOfBirthLabel,
+                onTap: () {
+                  showDatePicker(
+                    context: context,
+                    initialDate: widget.dateOfBirth,
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime.now(),
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                        data: ThemeData.dark().copyWith(
+                          primaryColor: Colors.black,
+                        ),
+                        child: child!,
+                      );
+                    },
+                  ).then((selectedDate) {
+                    if (selectedDate != null) {
+                      setState(() {
+                        this.selectedDateOfBirth = selectedDate;
+                        dateOfBirthController.text =
+                            DateFormat('yyyy-MM-dd').format(selectedDate);
+                      });
+                    }
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return AppMessage.mandatoryTx;
+                  }
+                  return null;
+                },
+              ),
               SizedBox(
                 height: 10.h,
               ),
-//==============================condition Menu===============================================================
               AppDropList(
                 listItem: AppConstants.conditionMenu,
                 validator: (v) {
@@ -143,7 +168,9 @@ class _UpdatePatientState extends State<UpdatePatient> {
                   }
                 },
                 onChanged: (selectedItem) {
-                  selectedCondition = selectedItem;
+                  setState(() {
+                    selectedCondition = selectedItem;
+                  });
                   print('selectedCondition: $selectedCondition');
                 },
                 hintText: selectedCondition,
@@ -152,32 +179,22 @@ class _UpdatePatientState extends State<UpdatePatient> {
               SizedBox(
                 height: 10.h,
               ),
-//==============================therapist Name===============================================================
-                           AppTextFields(
-                controller:therapistNameController,
-                labelText:AppMessage.therapist,
-
-    validator: (v) {
-    if (v == null) {
-    return AppMessage.mandatoryTx;
-    } else {
-    return null;
-    }
-    },
-
+              AppTextFields(
+                controller: therapistNameController,
+                labelText: AppMessage.therapist,
+                validator: (v) {
+                  if (v == null) {
+                    return AppMessage.mandatoryTx;
+                  } else {
+                    return null;
+                  }
+                },
                 obscureText: false,
-                    enable:false,
-
-                 ),
-
-
-
-
+                enable: false,
+              ),
               SizedBox(
                 height: 10.h,
               ),
-
-//==============================Add Button===============================================================
               AppButtons(
                 text: AppMessage.update,
                 bagColor: AppColor.iconColor,
@@ -189,11 +206,10 @@ class _UpdatePatientState extends State<UpdatePatient> {
                       firstName: firstNameController.text,
                       lastName: lastNameController.text,
                       phone: phoneController.text,
-                      age: int.parse(ageController.text),
+                      dateOfBirth: selectedDateOfBirth!,
                       condition: selectedCondition!,
                       docId: widget.docId,
                     ).then((v) {
-                     
                       if (v == "done") {
                         Navigator.pop(context);
                         Navigator.pop(context);
@@ -215,4 +231,3 @@ class _UpdatePatientState extends State<UpdatePatient> {
     );
   }
 }
-

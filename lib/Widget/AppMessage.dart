@@ -55,4 +55,5 @@ class AppMessage {
   static String sendEmail='Message sent successfully';
   static String sureEmail='Make sure the email is valid';
   static String emailFoundActiveUser ='This email belongs to an inactive user. Do you want to activate the user?';
+  static String dateOfBirth = 'Date of birth';
 }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:physio/Widget/generalWidget.dart';
 
 import '../../../Database/Database.dart';
@@ -27,11 +28,13 @@ class _AddNewPatientState extends State<AddNewPatient> {
   TextEditingController lastNameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailPathController = TextEditingController();
-  TextEditingController ageController = TextEditingController();
+  DateTime? selectedDateOfBirth;
   GlobalKey<FormState> addKey = GlobalKey();
   String? selectedCondition;
   String? generatedPassword;
-  String? docId;
+
+  static const String dateOfBirthLabel = 'Date of Birth';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +48,6 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 20.h,
               ),
-//==============================first name===============================================================
               AppTextFields(
                 controller: firstNameController,
                 labelText: AppMessage.firstName,
@@ -55,7 +57,6 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
-//==============================last name===============================================================
               AppTextFields(
                 controller: lastNameController,
                 labelText: AppMessage.lastName,
@@ -65,7 +66,6 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
-//==============================email name===============================================================
               AppTextFields(
                 controller: emailPathController,
                 labelText: AppMessage.emailTx,
@@ -75,33 +75,58 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
-//==============================phone number===============================================================
               AppTextFields(
-                  controller: phoneController,
-                  labelText: AppMessage.phoneTx,
-                  validator: (v) => AppValidator.validatorPhone(v),
-                  obscureText: false,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  keyboardType: TextInputType.number),
+                controller: phoneController,
+                labelText: AppMessage.phoneTx,
+                validator: (v) => AppValidator.validatorPhone(v),
+                obscureText: false,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                keyboardType: TextInputType.number,
+              ),
               SizedBox(
                 height: 10.h,
               ),
-//==============================age name===============================================================
               AppTextFields(
-                  controller: ageController,
-                  labelText: AppMessage.age,
-                  validator: (v) => AppValidator.validatorEmpty(v),
-                  obscureText: false,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  keyboardType: TextInputType.number),
+                controller: TextEditingController(
+                  text: selectedDateOfBirth != null
+                      ? DateFormat('yyyy-MM-dd').format(selectedDateOfBirth!)
+                      : '',
+                ),
+                labelText: dateOfBirthLabel,
+                onTap: () {
+                  showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime.now(),
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                        data: ThemeData.dark().copyWith(
+                          primaryColor: Colors.black,
+                        ),
+                        child: child!,
+                      );
+                    },
+                  ).then((selectedDate) {
+                    if (selectedDate != null) {
+                      setState(() {
+                        this.selectedDateOfBirth = selectedDate;
+                      });
+                    }
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return AppMessage.mandatoryTx;
+                  }
+                  return null;
+                },
+              ),
               SizedBox(
                 height: 10.h,
               ),
-//==============================condition Menu===============================================================
               AppDropList(
                 listItem: AppConstants.conditionMenu,
                 validator: (v) {
@@ -112,7 +137,9 @@ class _AddNewPatientState extends State<AddNewPatient> {
                   }
                 },
                 onChanged: (selectedItem) {
-                  selectedCondition = selectedItem;
+                  setState(() {
+                    selectedCondition = selectedItem;
+                  });
                   print('selectedCondition: $selectedCondition');
                 },
                 hintText: AppMessage.condition,
@@ -121,8 +148,6 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
-
-//==============================Add Button===============================================================
               AppButtons(
                 text: AppMessage.add,
                 bagColor: AppColor.iconColor,
@@ -140,39 +165,17 @@ class _AddNewPatientState extends State<AddNewPatient> {
                       email: emailPathController.text,
                       password: generatedPassword!,
                       phone: phoneController.text,
-                      age: int.parse(ageController.text),
+                      dateOfBirth: selectedDateOfBirth,
                       condition: selectedCondition!,
                     ).then((v) {
                       if (v == "done") {
                         Navigator.pop(context);
                         Navigator.pop(context);
-                        AppLoading.show(
-                            context, AppMessage.add, AppMessage.done);
+                        AppLoading.show(context, AppMessage.add, AppMessage.done);
                       } else if (v == 'email-already-in-use') {
                         Navigator.pop(context);
-                        AppLoading.show(context, 'inactive User',
-                            AppMessage.emailFoundActiveUser, showButtom: true,
-                            noFunction: () {
-                          Navigator.pop(context);
-                        }, yesFunction: () async {
-                          await AppConstants.userCollection
-                              .where('email',
-                                  isEqualTo: emailPathController.text)
-                              .get()
-                              .then((value) {
-                            for (var element in value.docs) {
-                              docId = element.id;
-                              setState(() {});
-                            }
-                          });
-
-                          await Database.updateActiveUser(
-                              docId: docId!, activeUser: true);
-                          print(
-                              'objectobjectobjectobjectobjectobjectobjectobjectobjectobjectobjectobject');
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        });
+                        AppLoading.show(
+                            context, AppMessage.add, AppMessage.emailFound);
                       } else {
                         Navigator.pop(context);
                         AppLoading.show(
@@ -181,7 +184,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
                     });
                   }
                 },
-              )
+              ),
             ],
           ),
         ),
@@ -189,3 +192,4 @@ class _AddNewPatientState extends State<AddNewPatient> {
     );
   }
 }
+
