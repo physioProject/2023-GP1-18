@@ -41,7 +41,8 @@ class ViewPatientInfo extends StatefulWidget {
     setState(() {
       final document = querySnapshot.docs.first;
       patientName = '${document['firstName']} ${document['lastName']}';
-      age = document['age'].toString();
+      DateTime dateOfBirth = document['dateOfBirth'].toDate();
+      age = _calculateAge(dateOfBirth).toString();
       patientCondition = document['condition'];
       patientEmail = document['email'];
       nameController.text=patientName;
@@ -50,6 +51,18 @@ class ViewPatientInfo extends StatefulWidget {
       emailController.text=patientEmail;
     });
   }
+  //==============================calculate age===============================================================
+  int _calculateAge(DateTime dateOfBirth) {
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - dateOfBirth.year;
+    if (currentDate.month < dateOfBirth.month ||
+        (currentDate.month == dateOfBirth.month &&
+            currentDate.day < dateOfBirth.day)) {
+      age--;
+    }
+    return age;
+  }
+
 //==============================open email===============================================================
   void openEmail() async {
     final Uri emailUri = Uri(
