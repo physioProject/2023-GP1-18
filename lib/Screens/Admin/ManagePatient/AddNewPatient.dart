@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:physio/Widget/generalWidget.dart';
-
 import '../../../Database/Database.dart';
 import '../../../Widget/AppBar.dart';
 import '../../../Widget/AppButtons.dart';
@@ -32,6 +31,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
   GlobalKey<FormState> addKey = GlobalKey();
   String? selectedCondition;
   String? generatedPassword;
+  String? docId;
 
   static const String dateOfBirthLabel = 'Date of Birth';
 
@@ -48,6 +48,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 20.h,
               ),
+              //==============================first name===============================================================
               AppTextFields(
                 controller: firstNameController,
                 labelText: AppMessage.firstName,
@@ -57,6 +58,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
+              //==============================last name===============================================================
               AppTextFields(
                 controller: lastNameController,
                 labelText: AppMessage.lastName,
@@ -66,6 +68,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
+              //==============================email name===============================================================
               AppTextFields(
                 controller: emailPathController,
                 labelText: AppMessage.emailTx,
@@ -75,6 +78,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
+              //==============================phone number===============================================================
               AppTextFields(
                 controller: phoneController,
                 labelText: AppMessage.phoneTx,
@@ -88,6 +92,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
+              //==============================Date of Birth & condition=============================
               AppTextFields(
                 controller: TextEditingController(
                   text: selectedDateOfBirth != null
@@ -148,6 +153,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
+              //==============================Add Button===============================================================
               AppButtons(
                 text: AppMessage.add,
                 bagColor: AppColor.iconColor,
@@ -171,11 +177,33 @@ class _AddNewPatientState extends State<AddNewPatient> {
                       if (v == "done") {
                         Navigator.pop(context);
                         Navigator.pop(context);
-                        AppLoading.show(context, AppMessage.add, AppMessage.done);
+                        AppLoading.show(
+                            context, AppMessage.add, AppMessage.done);
                       } else if (v == 'email-already-in-use') {
                         Navigator.pop(context);
-                        AppLoading.show(
-                            context, AppMessage.add, AppMessage.emailFound);
+                        AppLoading.show(context, 'inactive User',
+                            AppMessage.emailFoundActiveUser, showButtom: true,
+                            noFunction: () {
+                              Navigator.pop(context);
+                            }, yesFunction: () async {
+                              await AppConstants.userCollection
+                                  .where('email',
+                                  isEqualTo: emailPathController.text)
+                                  .get()
+                                  .then((value) {
+                                for (var element in value.docs) {
+                                  docId = element.id;
+                                  setState(() {});
+                                }
+                              });
+
+                              await Database.updateActiveUser(
+                                  docId: docId!, activeUser: true);
+                              print(
+                                  'objectobjectobjectobjectobjectobjectobjectobjectobjectobjectobjectobject');
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            });
                       } else {
                         Navigator.pop(context);
                         AppLoading.show(
@@ -184,7 +212,7 @@ class _AddNewPatientState extends State<AddNewPatient> {
                     });
                   }
                 },
-              ),
+              )
             ],
           ),
         ),
@@ -192,4 +220,3 @@ class _AddNewPatientState extends State<AddNewPatient> {
     );
   }
 }
-
