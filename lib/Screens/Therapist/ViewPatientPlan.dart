@@ -1,18 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import '../../Widget/AppImage.dart';
 import '../../../Widget/AppBar.dart';
 import '../../../Widget/AppMessage.dart';
 import '../../Widget/AppColor.dart';
 import '../../Widget/AppConstants.dart';
 import '../../Widget/AppIcons.dart';
+import '../../Widget/AppLoading.dart';
 import '../../Widget/AppRoutes.dart';
 import 'package:physio/Screens/Therapist/AddNewExercise.dart';
 import '../../Widget/AppSize.dart';
 import '../../Widget/AppText.dart';
 import 'package:physio/Screens/Therapist/UpdateExercise.dart';
-
 class ViewPatientPlan extends StatefulWidget {
   final String PatientId;
   const ViewPatientPlan({Key? key, required this.PatientId}) : super(key: key);
@@ -20,40 +20,29 @@ class ViewPatientPlan extends StatefulWidget {
   @override
   State<ViewPatientPlan> createState() => _ViewPatientPlanState();
 }
-
 class _ViewPatientPlanState extends State<ViewPatientPlan> {
+  late ImageProvider exerciseImg= AssetImage(AppImage.exercise);
   Future<void> deleteExercise(String documentId) async {
     try {
       await AppConstants.exerciseCollection.doc(documentId).delete();
-      // Optionally, you can add a message or perform other actions after deletion
     } catch (e) {
       print('Error deleting exercise: $e');
     }
   }
 
   Future<void> showDeleteConfirmationDialog(String documentId) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Are you sure?'),
-          content: Text('Do you want to delete this exercise for this patient?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: Text('Yes'),
-              onPressed: () {
-                deleteExercise(documentId);
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-          ],
-        );
+    AppLoading.show(
+      context,
+      'Delete exercise',
+      'Do you want to delete this exercise for this patient?',
+      showButtom: true,
+      noFunction: () {
+
+      },
+      yesFunction: () async {
+        Navigator.pop(context);
+        await deleteExercise(documentId);
+
       },
     );
   }
@@ -80,6 +69,16 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
               child: Center(
                 child: ListTile(
                   tileColor: AppColor.white,
+                  leading: CircleAvatar(
+                    radius: 30.sp,
+                    child: ClipOval(
+                      child: Image(
+                        image: exerciseImg,
+                        fit: BoxFit.cover,
+
+                      ),
+                    ),
+                  ),
                   trailing: InkWell(
                     onTap: () {
                       showDeleteConfirmationDialog(documentId);
@@ -98,7 +97,7 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
                       text: data['exercise'],
                       fontSize: AppSize.subTextSize,
                     ),
-                  ),
+                      ),
                 ),
               ),
             ),
@@ -108,9 +107,10 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
     )
         : Center(
       child: AppText(
-          text: AppMessage.noData,
-          fontSize: AppSize.subTextSize,
-          fontWeight: FontWeight.bold),
+        text: AppMessage.noData,
+        fontSize: AppSize.subTextSize,
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 
@@ -121,7 +121,8 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColor.iconColor,
         elevation: 10,
-        child: Icon(AppIcons.add),
+        child: Icon(AppIcons.add
+        ),
         onPressed: () {
           AppRoutes.pushTo(context, AddNewExercise(PatientId: widget.PatientId));
         },
@@ -132,7 +133,7 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
             .where('finishDate', isGreaterThan: DateTime.now().toString())
             .orderBy('finishDate')
             .snapshots(),
-        builder: (context, AsyncSnapshot snapshot) {
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('${snapshot.error}'));
           }
@@ -147,4 +148,3 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
     );
   }
 }
-
