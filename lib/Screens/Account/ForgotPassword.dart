@@ -28,7 +28,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     //===================================== Check the email format=================================
     if (!isEmailValid(email)) {
       AppLoading.show(
-          context, AppMessage.emailNotFound, AppMessage.sureEmail);
+          context, AppMessage.emailFormat, AppMessage.sureEmail);
 
     return;
     }
