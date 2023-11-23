@@ -57,6 +57,6 @@ class AppMessage {
   static String emailFoundActiveUser ='This email belongs to an inactive user. Do you want to activate the user?';
   static String dateOfBirth = 'Date of birth';
   static String send = 'send';
-  static  String emailNotFound='Email Not Found';
+  static  String emailFormat='Email Format';
 
 }
