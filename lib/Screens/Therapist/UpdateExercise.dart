@@ -9,6 +9,8 @@ import 'package:physio/Widget/AppDropList.dart';
 import 'package:physio/Widget/AppLoading.dart';
 import 'package:physio/Widget/AppTextFields.dart';
 
+import '../../Widget/AppBar.dart';
+
 class UpdateExercise extends StatefulWidget {
   final String exerciseId;
 
@@ -69,14 +71,8 @@ class _UpdateExerciseState extends State<UpdateExercise> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Update Exercise',
-          style: TextStyle(
-            color: Colors.black,
-          ),
-        ),
-        backgroundColor: Colors.grey,
+      appBar: AppBarWidget(text:   'Update Exercise',
+
       ),
       body: Form(
         key: updateKey,
@@ -87,12 +83,11 @@ class _UpdateExerciseState extends State<UpdateExercise> {
               SizedBox(
                 height: 20.h,
               ),
-              TextFormField(
+              AppTextFields(
                 controller: startDateController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  labelText: 'Start Date',
-                ),
+                labelText: 'start date',
+                obscureText: false,
+                enable: false,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Start Date is required';
@@ -211,3 +206,4 @@ class _UpdateExerciseState extends State<UpdateExercise> {
     }
   }
 }
+
