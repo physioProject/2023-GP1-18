@@ -14,6 +14,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:physio/Widget/AppSize.dart';
 import 'package:physio/Widget/AppText.dart';
 import 'package:physio/Widget/AppConstants.dart';
+import '../../../Database/Database.dart';
 
 
 class ManageAccount extends StatefulWidget {
@@ -36,7 +37,7 @@ class _ManageAccountState extends State<ManageAccount> {
   
   }
  
-  //======================= fetch Therapist Names from the firestore ======================================
+  //======================= fetch Therapist Names  ======================================
   Future<void> fetchTherapistNames() async {
     final querySnapshot = await FirebaseFirestore.instance
         .collection('users')
@@ -145,7 +146,7 @@ class _ManageAccountState extends State<ManageAccount> {
                          setState(() {
                            selectedTherapists[patientId] = selectedItem!;
                          });
-                         String result = await updateTherapistName(
+                         String result = await Database.updateTherapistName(
                            docId: patientId,
                            therapistId: therapistIds[therapistNames.indexOf(selectedItem!)],
                            therapistName: selectedItem!,
@@ -174,19 +175,5 @@ class _ManageAccountState extends State<ManageAccount> {
 
 
 
+}
 
-  //=======================update the Therapist Name for specific patient ======================================
-  Future<String> updateTherapistName({
-    required String therapistId,
-    required String docId,
-    required String therapistName,}) async {
-    try {
-      await AppConstants.userCollection.doc(docId).update({
-        'therapistId': therapistId,
-
-        'therapistName':therapistName,
-      });
-      return 'done';
-    } catch (e) {
-      return 'error';
-    }}}
