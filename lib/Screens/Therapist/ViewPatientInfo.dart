@@ -72,7 +72,7 @@ class ViewPatientInfo extends StatefulWidget {
     if (await canLaunchUrl(emailUri)) {
       await launchUrl(emailUri);
     } else {
-      print('could not launch email');
+        AppLoading.show(context,'open','could not launch email');
     }
   }
 
