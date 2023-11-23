@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:physio/Widget/AppButtons.dart';
 import 'package:physio/Widget/AppTextFields.dart';
+import '../../Widget/AppLoading.dart';
 import '../../Widget/AppMessage.dart';
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
@@ -26,14 +27,17 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
     //===================================== Check the email format=================================
     if (!isEmailValid(email)) {
-      showSnackBar(AppMessage.sureEmail);
-      return;
+      AppLoading.show(
+          context, AppMessage.emailNotFound, AppMessage.sureEmail);
+
+    return;
     }
 //=============================Check if the user is registered===============================
     try {
       if (await isEmailRegistered(email)) {
         await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-        showSuccessDialog(AppMessage.sendEmail);
+        AppLoading.show(
+            context, AppMessage.sendEmail, AppMessage.done);
       } else {
         showDialog(
           context: context,
@@ -61,6 +65,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
+        .where('activeUser', isEqualTo: true)
         .get();
 
     return querySnapshot.docs.isNotEmpty;
