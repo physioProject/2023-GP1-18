@@ -8,7 +8,7 @@ class AppMessage {
   static String loginTx = 'Logging';
   static String acountIsDesabled='the acount is disabled';
   static String PatientList='Patients List';
-  static String PatientInfo='Patient';
+  static String PatientInfo='Patient Info';
   static String PatientPlan='Customized Plan';
   static String PatientReport='Report';
   static String duration='Duration';
@@ -56,4 +56,7 @@ class AppMessage {
   static String sureEmail='Make sure the email is valid';
   static String emailFoundActiveUser ='This email belongs to an inactive user. Do you want to activate the user?';
   static String dateOfBirth = 'Date of birth';
+  static String send = 'send';
+  static  String emailNotFound='Email Not Found';
+
 }
