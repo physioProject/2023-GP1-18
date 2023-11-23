@@ -28,7 +28,7 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
   TextEditingController dobController = TextEditingController();
   GlobalKey<FormState> addKey = GlobalKey();
   String? generatedPassword;
-
+  String? docId;
   @override
   void initState() {
     super.initState();
@@ -150,11 +150,33 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
                       if (v == "done") {
                         Navigator.pop(context);
                         Navigator.pop(context);
-                        AppLoading.show(context, AppMessage.add, AppMessage.done);
+                        AppLoading.show(
+                            context, AppMessage.add, AppMessage.done);
                       } else if (v == 'email-already-in-use') {
                         Navigator.pop(context);
-                        AppLoading.show(
-                            context, AppMessage.add, AppMessage.emailFound);
+                        AppLoading.show(context, 'inactive User',
+                            AppMessage.emailFoundActiveUser, showButtom: true,
+                            noFunction: () {
+                              Navigator.pop(context);
+                            }, yesFunction: () async {
+                              await AppConstants.userCollection
+                                  .where('email',
+                                  isEqualTo: emailPathController.text)
+                                  .get()
+                                  .then((value) {
+                                for (var element in value.docs) {
+                                  docId = element.id;
+                                  setState(() {});
+                                }
+                              });
+
+                              await Database.updateActiveUser(
+                                  docId: docId!, activeUser: true);
+                              print(
+                                  'objectobjectobjectobjectobjectobjectobjectobjectobjectobjectobjectobject');
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            });
                       } else {
                         Navigator.pop(context);
                         AppLoading.show(
