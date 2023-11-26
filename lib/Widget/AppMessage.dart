@@ -1,19 +1,20 @@
 class AppMessage {
   static String mandatoryTx = 'Mandatory field';
   static String invalidName = 'The name is not valid';
-  static String invalidPatientCount='number of patient is not valid';
+  static String invalidPatientCount = 'number of patient is not valid';
   static String invalidEmail = 'The email is not valid';
   static String invalidPassword = 'Password must be at least 6 digits';
   static String invalidPhone = 'Invalid phone number';
   static String loginTx = 'Logging';
-  static String acountIsDesabled='the acount is disabled';
-  static String PatientList='Patients List';
-  static String PatientInfo='Patient Info';
-  static String PatientPlan='Customized Plan';
-  static String PatientReport='Report';
-  static String duration='Duration';
-  static String fullName='Full Name';
-  static String Addingexercise='Adding exercise';
+  static String acountIsDesabled = 'the acount is disabled';
+  static String PatientList = 'Patients List';
+  static String PatientInfo = 'Patient Info';
+  static String PatientPlan = 'Customized Plan';
+  static String myPlan = 'My Plan';
+  static String PatientReport = 'Report';
+  static String duration = 'Duration';
+  static String fullName = 'Full Name';
+  static String Addingexercise = 'Adding exercise';
   static String singUpTx = 'Sign Up';
   static String noHaveAccountTx = 'No have Account?';
   static String firstName = 'First Name';
@@ -39,7 +40,7 @@ class AppMessage {
   static String update = 'Update';
   static String noData = 'There is no data to display at this time';
   static String add = 'Add';
-   static String RestTx='Reset password';
+  static String RestTx = 'Reset password';
   static String done = 'The operation completed successfully';
   static String manageAccount = 'Manage';
   static String managePatient = 'Patients';
@@ -51,12 +52,13 @@ class AppMessage {
   static String updatePatient = 'Updating Patient';
   static String addTherapist = 'Adding Therapist';
   static String updateTherapist = 'Updating Therapist';
-  static String accountNotActive='click profile icon to activate';
-  static String sendEmail='Message sent successfully';
-  static String sureEmail='Make sure the email is valid';
-  static String emailFoundActiveUser ='This email belongs to an inactive user. Do you want to activate the user?';
+  static String accountNotActive = 'click profile icon to activate';
+  static String sendEmail = 'Message sent successfully';
+  static String sureEmail = 'Make sure the email is valid';
+  static String emailFoundActiveUser =
+      'This email belongs to an inactive user. Do you want to activate the user?';
   static String dateOfBirth = 'Date of birth';
   static String send = 'send';
-  static  String emailFormat='Email Format';
-
+  static String emailFormat = 'Email Format';
 }
+
