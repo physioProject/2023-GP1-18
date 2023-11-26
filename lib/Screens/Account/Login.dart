@@ -15,7 +15,7 @@ import '../../Widget/AppMessage.dart';
 import '../../Widget/AppTextFields.dart';
 import '../../Widget/AppValidator.dart';
 import '../Patient/PatientHome.dart';
-import '../Therapist/ViewPatients.dart';
+import '../Therapist/ViewPatientList.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -30,6 +30,8 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   GlobalKey<FormState> logKey = GlobalKey();
   String? selectedType;
+
+  var patientId;
   @override
   void initState() {
     super.initState();
@@ -174,13 +176,16 @@ class _LoginState extends State<Login> {
                                   element.data()['activeUser'] == true) {
                                 if (element.data()['type'] ==
                                     AppConstants.typeIsPatient) {
+                                  String patientId = element.data()['userId'];
                                   AppRoutes.pushReplacementTo(
                                       context,
                                       PatientHome(
                                         name: element.data()['firstName'] +
                                             ' ' +
                                             element.data()['lastName'],
-                                      ));
+                                           patientId: patientId,
+
+                                  ));
                                 } else if (element.data()['type'] ==
                                     AppConstants.typeIsTherapist) {
                                   if (selectedType ==
