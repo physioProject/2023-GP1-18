@@ -1,61 +1,71 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:physio/Screens/Account/Login.dart';
-import 'package:physio/Screens/Patient/ChangePass.dart';
-import 'package:physio/Widget/AppLoading.dart';
-import 'package:physio/Widget/AppRoutes.dart';
-import 'package:physio/Widget/AppTextFields.dart';
+import 'package:physio/Screens/Patient/patient_plan_view.dart';
+import 'package:physio/Screens/Patient/report_view.dart';
+import 'package:physio/Widget/AppMessage.dart';
 
-import '../../Database/Database.dart';
-import '../../Widget/AppBar.dart';
-import '../../Widget/AppButtons.dart';
 import '../../Widget/AppColor.dart';
 import '../../Widget/AppIcons.dart';
-import '../../Widget/AppMessage.dart';
-import '../../Widget/AppPopUpMen.dart';
-import '../../Widget/AppSize.dart';
-import '../../Widget/AppText.dart';
-import '../../Widget/AppValidator.dart';
-import '../../Widget/GeneralWidget.dart';
 
 class PatientHome extends StatefulWidget {
   final String name;
-  const PatientHome({Key? key, required this.name}) : super(key: key);
+  final String patientId;
+  const PatientHome({Key? key,required this.patientId ,required this.name,  }) : super(key: key);
 
   @override
   State<PatientHome> createState() => _PatientHomeState();
 }
 
 class _PatientHomeState extends State<PatientHome> {
+  int selectedIndex = 0;
+  late String SelectedUser;
+  PageController? pageController;
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWidget(
-          text: 'Patient Home',
-          leading: AppPopUpMen(
-              icon: CircleAvatar(
-                backgroundColor: AppColor.black,
-                child: Icon(AppIcons.menu),
-              ),
-              menuList: AppWidget.itemList(
-                  onTapChangePass: () =>
-                      AppRoutes.pushTo(context, const ChangePass()),
-                  isChangePassword: true,
-                  helloName: 'Hello Patient ${widget.name}',
-                  action: () {
-                    Database.logOut();
-                    AppRoutes.pushReplacementTo(context, const Login());
-                  }))),
-      body: Center(
-        child: AppButtons(
-          onPressed: () {
-            Database.logOut;
-            AppRoutes.pushReplacementTo(context, Login());
-          },
-          text: 'LogOut',
-        ),
-      ),
-    );
+  void initState() {
+    super.initState();
+    pageController = PageController(initialPage: selectedIndex);
+    SelectedUser=widget.patientId;
+
+
+    // pageController = PageController(initialPage: currentIndex);
+  }
+@override
+Widget build(BuildContext context) {
+  List<Widget> page = [PatientPlanView(patientId:widget.patientId,name:widget.name,), ReportView(patientId:widget.patientId,name:widget.name,)];
+  return Scaffold(
+
+    body: PageView(
+      physics: const NeverScrollableScrollPhysics(),
+      controller: pageController,
+      children: page,
+    ),
+    bottomNavigationBar: BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: AppColor.iconColor,
+      selectedFontSize: 14,
+      selectedItemColor: AppColor.white,
+      unselectedItemColor: Colors.grey[500],
+      unselectedFontSize: 11,
+      currentIndex: selectedIndex,
+      onTap: onTabTapped,
+      items: [
+        BottomNavigationBarItem(
+            icon: Icon(AppIcons.manageAccounts),
+            label: AppMessage.PatientReport,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(AppIcons.managePatient),
+            label: AppMessage.myPlan,
+          ),
+      ],
+    ),
+  );
+}void onTabTapped(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+    pageController?.animateToPage(selectedIndex,
+        duration: const Duration(milliseconds: 400), curve: Curves.easeInCirc);
   }
 }
+
+
