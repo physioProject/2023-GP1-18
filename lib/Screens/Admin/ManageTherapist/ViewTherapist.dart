@@ -115,10 +115,10 @@ class _ViewTherapistState extends State<ViewTherapist> {
                             });
                           },
 
-                          child: Icon(
+                         child: Icon(
                             AppIcons.profile,
                             size: 45.spMin,
-                            color: data['status'] == 0 ? AppColor.black : null,
+                            color: data['status'] == 0 ? AppColor.errorColor : null,
                           ),
                         ),
 //active account text==================================================================================================
