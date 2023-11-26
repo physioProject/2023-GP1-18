@@ -39,14 +39,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         AppLoading.show(
             context, AppMessage.sendEmail, AppMessage.done);
       } else {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              content: Text(AppMessage.userNotFound),
-            );
-          },
-        );
+        AppLoading.show(
+            context, AppMessage.sendEmail, AppMessage.userNotFound);
       }
     }
     //===========================Catch other exceptions =============================
