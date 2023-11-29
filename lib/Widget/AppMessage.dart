@@ -54,6 +54,7 @@ class AppMessage {
   static String updateTherapist = 'Updating Therapist';
   static String accountNotActive = 'click profile icon to activate';
   static String sendEmail = 'Message sent successfully';
+  static String notsendEmail = 'Message could not sent';
   static String sureEmail = 'Make sure the email is valid';
   static String emailFoundActiveUser =
       'This email belongs to an inactive user. Do you want to activate the user?';
@@ -61,4 +62,5 @@ class AppMessage {
   static String send = 'send';
   static String emailFormat = 'Email Format';
 }
+
 
