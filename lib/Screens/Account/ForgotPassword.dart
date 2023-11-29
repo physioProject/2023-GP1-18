@@ -40,7 +40,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             context, AppMessage.sendEmail, AppMessage.done);
       } else {
         AppLoading.show(
-            context, AppMessage.sendEmail, AppMessage.userNotFound);
+            context, AppMessage.notsendEmail, AppMessage.userNotFound);
       }
     }
     //===========================Catch other exceptions =============================
