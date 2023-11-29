@@ -7,6 +7,7 @@ import 'package:physio/Widget/AppColor.dart';
 import 'package:physio/Widget/AppConstants.dart';
 import 'package:physio/Widget/AppDropList.dart';
 import 'package:physio/Widget/AppLoading.dart';
+import 'package:physio/Widget/AppMessage.dart';
 import 'package:physio/Widget/AppTextFields.dart';
 
 import '../../Widget/AppBar.dart';
@@ -199,10 +200,10 @@ class _UpdateExerciseState extends State<UpdateExercise> {
       });
 
       Navigator.pop(context);
-      AppLoading.show(context, 'Update', 'Done');
+      AppLoading.show(context, 'Update', AppMessage.done);
     } catch (e) {
       print('Error updating exercise: $e');
-      AppLoading.show(context, 'Update', 'Error');
+      AppLoading.show(context, 'Update', AppMessage.error);
     }
   }
 }
