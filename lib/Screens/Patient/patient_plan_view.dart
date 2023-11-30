@@ -59,6 +59,8 @@ class _PatientPlanViewState extends State<PatientPlanView> {
       body: StreamBuilder(
           stream: AppConstants.exerciseCollection
               .where('userId', isEqualTo:widget.patientId)
+              .where('finishDate', isGreaterThan: DateTime.now().toString())
+              .orderBy('finishDate')
               .snapshots(),
           builder: (context, AsyncSnapshot snapshot) {
             if (snapshot.hasError) {
