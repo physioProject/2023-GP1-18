@@ -63,13 +63,14 @@ class _AddNewExerciseState extends State<AddNewExercise> {
                 controller: startDateController,
 
                 onTap: () {
-                  showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                    builder: (BuildContext context, Widget? child) {
-                      return Theme(
+
+    showDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime.now(),
+    lastDate: DateTime(2100),
+    builder: (BuildContext context, Widget? child) {
+    return Theme(
                         data: ThemeData(
 
                           colorScheme: ColorScheme.light().copyWith(
@@ -81,13 +82,19 @@ class _AddNewExerciseState extends State<AddNewExercise> {
                     },
                   ).then((selectedDate) {
                     if (selectedDate != null) {
+    DateTime selectedEndDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    DateTime currentDateTime = DateTime.now();
+    DateTime currentDate = DateTime(currentDateTime.year, currentDateTime.month, currentDateTime.day);
+    if (selectedEndDate.isBefore(currentDate)) {
+    return 'start date must be after current date';
+    } else {
                       setState(() {
                         startDateController.text =
                             DateFormat('yyyy-MM-dd').format(selectedDate);
                         calculateDuration();
                       });
                     }
-                  });
+                  }});
                 },
                 labelText: AppMessage.startDate,
 
@@ -129,10 +136,10 @@ class _AddNewExerciseState extends State<AddNewExercise> {
     },
     ).then((selectedDate) {
     if (selectedDate != null) {
-    DateTime selectedEndDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    DateTime selectedStartDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
     DateTime currentDateTime = DateTime.now();
     DateTime currentDate = DateTime(currentDateTime.year, currentDateTime.month, currentDateTime.day);
-    if (selectedEndDate.isBefore(currentDate)) {
+    if (selectedStartDate.isBefore(currentDate)) {
       return 'Finish date must be after current date';
     } else {
                       setState(() {
