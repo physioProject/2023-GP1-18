@@ -15,7 +15,8 @@ import '../../Widget/AppText.dart';
 import 'package:physio/Screens/Therapist/UpdateExercise.dart';
 class ViewPatientPlan extends StatefulWidget {
   final String PatientId;
-  const ViewPatientPlan({Key? key, required this.PatientId}) : super(key: key);
+
+  const ViewPatientPlan({Key? key, required this.PatientId, }) : super(key: key);
 
   @override
   State<ViewPatientPlan> createState() => _ViewPatientPlanState();
