@@ -49,12 +49,12 @@ Widget build(BuildContext context) {
       onTap: onTabTapped,
       items: [
         BottomNavigationBarItem(
-            icon: Icon(AppIcons.manageAccounts),
-            label: AppMessage.PatientReport,
-          ),
-          BottomNavigationBarItem(
             icon: Icon(AppIcons.managePatient),
             label: AppMessage.myPlan,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(AppIcons.manageAccounts),
+            label: AppMessage.PatientReport,
           ),
       ],
     ),
@@ -67,5 +67,4 @@ Widget build(BuildContext context) {
         duration: const Duration(milliseconds: 400), curve: Curves.easeInCirc);
   }
 }
-
 
