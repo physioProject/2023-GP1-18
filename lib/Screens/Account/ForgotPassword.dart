@@ -93,10 +93,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBarWidget(text:'Forgot Password'),
+      appBar: AppBarWidget(text: 'Forgot Password'),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: Text(
@@ -105,30 +106,28 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               style: TextStyle(fontSize: 20),
             ),
           ),
+          SizedBox(height: 10), SizedBox( width: 400.0,
+              height: 50.0,
+              child: AppTextFields(
+                controller: emailController,
+                labelText: AppMessage.emailTx,
+                validator: (v) => AppValidator.validatorEmail(v),
+                obscureText: false,
+              ),
+            ),
 
           SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: AppTextFields(
-              controller: emailController,
 
-    labelText: AppMessage.emailTx,
-    validator: (v) => AppValidator.validatorEmail(v),
-    obscureText: false,
-    ),
+            SizedBox(
+              width: 400.0,
+              height: 50.0,
+              child: AppButtons(
+                onPressed: passReset,
+                text: 'Reset password',
               ),
-
-
-          SizedBox(height: 15),
-          SizedBox(
-
-            child: AppButtons(
-              onPressed: passReset,
-              text: 'Reset password',
             ),
-          )
+
         ],
       ),
     );
-  }
-}
+  }}
