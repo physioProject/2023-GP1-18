@@ -339,10 +339,9 @@ class Database {
     return 'error';
   }
 //=======================Active user======================================
-
-  static Future<String> updateActiveUser(
+static Future<String> updateActiveUser(
       {required String docId, required bool activeUser,   userId,
-   type}) async {
+        type}) async {
     try {
       await AppConstants.userCollection.doc(docId).update({
         'activeUser': activeUser,
@@ -365,6 +364,13 @@ class Database {
           );
         });
       }
+      else if(type == 'patient'&& activeUser==false){
+      await updateTherapistName(
+      docId: docId,
+      therapistId: 'undefined',
+      therapistName: 'undefined',
+      );}
+
       return 'done';
     } catch (e) {
       return 'error';
