@@ -128,18 +128,18 @@ class Database {
   }
 
   //=======================patient SingUp ======================================
-  static Future<String> updatePatient(
+    static Future<String> updatePatient(
       {required String firstName,
         required String lastName,
         required String docId,
         required String phone,
-        required DateTime dateOfBirth,
+
         required String condition}) async {
     try {
       await AppConstants.userCollection.doc(docId).update({
         'firstName': firstName,
         'lastName': lastName,
-        'dateOfBirth': dateOfBirth,
+
         'phone': phone,
         'condition': condition,
       });
