@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:physio/Widget/AppButtons.dart';
 import 'package:physio/Widget/AppTextFields.dart';
+import '../../Widget/AppBar.dart';
 import '../../Widget/AppLoading.dart';
 import '../../Widget/AppMessage.dart';
+import '../../Widget/AppValidator.dart';
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
 
@@ -25,13 +27,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Future<void> passReset() async {
     final email = emailController.text.trim();
 
-    //===================================== Check the email format=================================
-    if (!isEmailValid(email)) {
-      AppLoading.show(
-          context, AppMessage.emailFormat, AppMessage.sureEmail);
-
-    return;
-    }
 //=============================Check if the user is registered===============================
     try {
       if (await isEmailRegistered(email)) {
@@ -40,7 +35,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             context, AppMessage.sendEmail, AppMessage.done);
       } else {
         AppLoading.show(
-              context, AppMessage.notsendEmail, AppMessage.userNotFound);
+            context, AppMessage.notsendEmail, AppMessage.userNotFound);
       }
     }
     //===========================Catch other exceptions =============================
@@ -59,7 +54,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
-        .where('activeUser', isEqualTo: true)
         .get();
 
     return querySnapshot.docs.isNotEmpty;
@@ -99,10 +93,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-      ),
+        appBar: AppBarWidget(text:'Forgot Password'),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -118,24 +109,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: TextField(
+            child: AppTextFields(
               controller: emailController,
-              decoration: InputDecoration(
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueGrey),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                hintText: AppMessage.emailTx,
-                fillColor: Colors.white,
-                filled: true,
+
+    labelText: AppMessage.emailTx,
+    validator: (v) => AppValidator.validatorEmail(v),
+    obscureText: false,
+    ),
               ),
-            ),
-          ),
+
 
           SizedBox(height: 15),
           SizedBox(
-            width: 200.0,
-            height: 40.0,
+
             child: AppButtons(
               onPressed: passReset,
               text: 'Reset password',
