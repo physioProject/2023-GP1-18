@@ -124,6 +124,8 @@ class _UpdatePatientState extends State<UpdatePatient> {
               AppTextFields(
                 controller: dateOfBirthController,
                 labelText: dateOfBirthLabel,
+                obscureText: false,
+                enable: false,
                 onTap: () {
                   showDatePicker(
                     context: context,
@@ -135,6 +137,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
                         data: ThemeData.dark().copyWith(
                           primaryColor: Colors.black,
                         ),
+
                         child: child!,
                       );
                     },
@@ -206,7 +209,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
                       firstName: firstNameController.text,
                       lastName: lastNameController.text,
                       phone: phoneController.text,
-                      dateOfBirth: selectedDateOfBirth!,
+
                       condition: selectedCondition!,
                       docId: widget.docId,
                     ).then((v) {
@@ -231,3 +234,4 @@ class _UpdatePatientState extends State<UpdatePatient> {
     );
   }
 }
+
