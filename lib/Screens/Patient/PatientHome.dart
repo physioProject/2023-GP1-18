@@ -1,32 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:physio/Screens/Patient/patient_plan_view.dart';
 
-import '../../../Widget/AppBar.dart';
+import 'package:physio/Widget/AppMessage.dart';
 
-import '../../../Widget/AppMessage.dart';
+import '../../Widget/AppColor.dart';
+import '../../Widget/AppIcons.dart';
 
-class ViewPatientReport extends StatefulWidget {
-  final String PatientId;
-  const ViewPatientReport({Key? key,required this.PatientId}) : super(key: key);
+class PatientHome extends StatefulWidget {
+  final String name;
+  final String patientId;
+  const PatientHome({Key? key,required this.patientId ,required this.name,  }) : super(key: key);
 
   @override
-  State<ViewPatientReport> createState() => _ViewPatientReportState();
+  State<PatientHome> createState() => _PatientHomeState();
 }
 
-class _ViewPatientReportState extends State<ViewPatientReport> {
+class _PatientHomeState extends State<PatientHome> {
+  int selectedIndex = 0;
+  late String SelectedUser;
+  PageController? pageController;
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBarWidget(text: AppMessage.PatientReport),
-        body: Form(
+  void initState() {
+    super.initState();
+    pageController = PageController(initialPage: selectedIndex);
+    SelectedUser=widget.patientId;
 
-            child: Padding(
-                padding:  EdgeInsets.symmetric(horizontal: 10.w),
-                child: ListView(
-                    children: [
-                      SizedBox(
-                        height: 20.h,
-                      ),
-                    ]
-                ) ) ) ); }
+
+    // pageController = PageController(initialPage: currentIndex);
+  }
+@override
+Widget build(BuildContext context) {
+  List<Widget> page = [PatientPlanView(patientId:widget.patientId,name:widget.name,)];
+  return Scaffold(
+
+    body: PageView(
+      physics: const NeverScrollableScrollPhysics(),
+      controller: pageController,
+      children: page,
+    ),
+
+
+
+  );
+}void onTabTapped(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+    pageController?.animateToPage(selectedIndex,
+        duration: const Duration(milliseconds: 400), curve: Curves.easeInCirc);
+  }
 }
+
