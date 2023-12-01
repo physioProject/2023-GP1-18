@@ -151,6 +151,8 @@ class _ViewPatientState extends State<ViewPatient> {
 
                               await Database.updateActiveUser(
                                   docId: snapshot.data.docs[i].id,
+                            userId:data['userId'],
+                            type:data['type'],
                                   activeUser: data['activeUser'] == true
                                       ? false
                                       : true);
