@@ -1,35 +1,36 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:physio/Screens/Admin/ManageTherapist/AddNewTherapist.dart';
+import 'package:physio/Database/Database.dart';
+import 'package:physio/Screens/Account/Login.dart';
+import 'package:physio/Screens/Admin/ManagePatient/AddNewPatient.dart';
+import 'package:physio/Screens/Admin/ManagePatient/UpdatePatient.dart';
+import 'package:physio/Widget/AppBar.dart';
+import 'package:physio/Widget/AppIcons.dart';
+import 'package:physio/Widget/AppMessage.dart';
+import 'package:physio/Widget/AppPopUpMen.dart';
+import 'package:physio/Widget/AppRoutes.dart';
+import 'package:physio/Widget/AppSize.dart';
+import 'package:physio/Widget/AppText.dart';
+import 'package:physio/Widget/generalWidget.dart';
 
-import '../../../Database/Database.dart';
-import '../../../Widget/AppBar.dart';
 import '../../../Widget/AppColor.dart';
 import '../../../Widget/AppConstants.dart';
-import '../../../Widget/AppIcons.dart';
 import '../../../Widget/AppLoading.dart';
-import '../../../Widget/AppMessage.dart';
-import '../../../Widget/AppPopUpMen.dart';
-import '../../../Widget/AppRoutes.dart';
-import '../../../Widget/AppSize.dart';
-import '../../../Widget/AppText.dart';
-import '../../../Widget/generalWidget.dart';
-import '../../Account/Login.dart';
-import 'UpdateTherapist.dart';
 
-class ViewTherapist extends StatefulWidget {
-  const ViewTherapist({Key? key}) : super(key: key);
+class ViewPatient extends StatefulWidget {
+  const ViewPatient({Key? key}) : super(key: key);
 
   @override
-  State<ViewTherapist> createState() => _ViewTherapistState();
+  State<ViewPatient> createState() => _ViewPatientState();
 }
 
-class _ViewTherapistState extends State<ViewTherapist> {
+class _ViewPatientState extends State<ViewPatient> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBarWidget(
-            text: AppMessage.manageTherapistB,
+            text: AppMessage.managePatientB,
             leading: AppPopUpMen(
                 icon: CircleAvatar(
                   backgroundColor: AppColor.black,
@@ -44,11 +45,11 @@ class _ViewTherapistState extends State<ViewTherapist> {
             elevation: 10,
             child: Icon(AppIcons.add),
             onPressed: () {
-              AppRoutes.pushTo(context, const AddNewTherapist());
+              AppRoutes.pushTo(context, const AddNewPatient());
             }),
         body: StreamBuilder(
             stream: AppConstants.userCollection
-                .where('type', isEqualTo: AppConstants.typeIsTherapist)
+                .where('type', isEqualTo: AppConstants.typeIsPatient)
                 .orderBy('activeUser', descending: true)
                 .snapshots(),
             builder: (context, AsyncSnapshot snapshot) {
@@ -81,15 +82,19 @@ class _ViewTherapistState extends State<ViewTherapist> {
               child: Center(
                 child: ListTile(
                   onTap: () {
+                    print('Tapped on patient, navigating to UpdatePatient');
                     AppRoutes.pushTo(
                         context,
-                        UpdateTherapist(
-                            docId: snapshot.data.docs[i].id,
-                            firstName: data['firstName'],
-                            lastName: data['lastName'],
-                            phone: data['phone'],
-                            email: data['email'],
-                            userId: data['userId']));
+                        UpdatePatient(
+                          docId: snapshot.data.docs[i].id,
+                          firstName: data['firstName'],
+                          lastName: data['lastName'],
+                          phone: data['phone'],
+                          dateOfBirth: (data['dateOfBirth'] as Timestamp).toDate() ?? DateTime.now(),
+                          condition: data['condition'],
+                          email: data['email'],
+                          therapistName: data['therapistName'],
+                        ));
                   },
                   tileColor: AppColor.white,
                   leading: InkWell(
@@ -125,7 +130,7 @@ class _ViewTherapistState extends State<ViewTherapist> {
                   subtitle: AppText(
                     text: data['status'] == 0
                         ? AppMessage.accountNotActive
-                        : '',
+                        : 'Password send',
                     fontSize: AppSize.subTextSize,
                   ),
 //active user icon==================================================================================================
@@ -184,6 +189,4 @@ class _ViewTherapistState extends State<ViewTherapist> {
   }
 }
 
-
-
-//=========================================
+//===
