@@ -74,7 +74,7 @@ class _ChangePassState extends State<ChangePass> {
                               Navigator.pop(context);
                               Navigator.pop(context);
                               AppLoading.show(
-                                  context, 'Change Password', AppMessage.done);
+                                  context, 'Change Password', 'password have been changed successfully');
                             } else {
                               Navigator.pop(context);
                               AppLoading.show(context, 'Change Password',

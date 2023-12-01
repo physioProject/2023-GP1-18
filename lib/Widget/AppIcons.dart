@@ -11,6 +11,8 @@ class AppIcons {
   static IconData profile =Icons.account_circle;
   static IconData add =Icons.add;
   static IconData delete =Icons.delete;
+  static IconData active =Icons.toggle_on;
+  static IconData unActive =Icons.toggle_off;
   static IconData menu =Icons.menu;
   static IconData report=Icons.bar_chart_outlined;
   static IconData patientPlan=Icons.ballot_outlined;
@@ -21,8 +23,7 @@ class AppIcons {
   static IconData name=Icons.account_box;
   static IconData condition=Icons.airline_seat_flat;
 
-  static IconData active =Icons.toggle_on;
-  static IconData unActive =Icons.toggle_off;
+
 
 
 }

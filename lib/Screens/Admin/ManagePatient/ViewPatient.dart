@@ -50,7 +50,7 @@ class _ViewPatientState extends State<ViewPatient> {
         body: StreamBuilder(
             stream: AppConstants.userCollection
                 .where('type', isEqualTo: AppConstants.typeIsPatient)
-                .where('activeUser', isEqualTo: true)
+                .orderBy('activeUser', descending: true)
                 .snapshots(),
             builder: (context, AsyncSnapshot snapshot) {
               if (snapshot.hasError) {
@@ -136,23 +136,34 @@ class _ViewPatientState extends State<ViewPatient> {
 //active user icon==================================================================================================
                         trailing: InkWell(
                           onTap: () async {
-                            AppLoading.show(context, 'inactive User',
-                                'Do you inactive user?', showButtom: true,
-                                noFunction: () {
+                            AppLoading.show(
+                                context,
+                                data['activeUser'] == true
+                                    ? 'Deactivate the user'
+                                    : 'User activation',
+                                data['activeUser'] == true
+                                    ? 'Do you want to disable account activation?'
+                                    : 'Do you want to activate the account?',
+                                showButtom: true, noFunction: () {
                               Navigator.pop(context);
                             }, yesFunction: () async {
                               Navigator.pop(context);
+
                               await Database.updateActiveUser(
                                   docId: snapshot.data.docs[i].id,
-                                 userId:data['userId'],
-                                  type:data['type'],
-                                  activeUser: false);
+                                  activeUser: data['activeUser'] == true
+                                      ? false
+                                      : true);
                             });
                           },
                           child: Icon(
-                            AppIcons.active,
+                            data['activeUser'] == true
+                                ? AppIcons.unActive
+                                : AppIcons.active,
                             size: 60.spMin,
-                            color: AppColor.activeColor,
+                            color: data['activeUser'] == true
+                                ? AppColor.activeColor
+                                : AppColor.unActiveColor,
                           ),
                         ),
 //name icon==================================================================================================

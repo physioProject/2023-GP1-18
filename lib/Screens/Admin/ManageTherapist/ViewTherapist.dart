@@ -49,7 +49,7 @@ class _ViewTherapistState extends State<ViewTherapist> {
         body: StreamBuilder(
             stream: AppConstants.userCollection
                 .where('type', isEqualTo: AppConstants.typeIsTherapist)
-                .where('activeUser', isEqualTo: true)
+                .orderBy('activeUser', descending: true)
                 .snapshots(),
             builder: (context, AsyncSnapshot snapshot) {
               if (snapshot.hasError) {
@@ -115,10 +115,10 @@ class _ViewTherapistState extends State<ViewTherapist> {
                             });
                           },
 
-                         child: Icon(
+                          child: Icon(
                             AppIcons.profile,
                             size: 45.spMin,
-                            color: data['status'] == 0 ? AppColor.errorColor : null,
+                            color: data['status'] == 0 ? AppColor.black : null,
                           ),
                         ),
 //active account text==================================================================================================
@@ -131,23 +131,34 @@ class _ViewTherapistState extends State<ViewTherapist> {
 //active user icon==================================================================================================
                         trailing: InkWell(
                           onTap: () async {
-                            AppLoading.show(context, 'inactive User',
-                                'Do you inactive user?', showButtom: true,
-                                noFunction: () {
-                                  Navigator.pop(context);
-                                }, yesFunction: () async {
-                                  Navigator.pop(context);
-                                  await Database.updateActiveUser(
-                                      docId: snapshot.data.docs[i].id,
-                                     userId:data['userId'],
-                                      type:data['type'],
-                                      activeUser: false);
-                                });
+                            AppLoading.show(
+                                context,
+                                data['activeUser'] == true
+                                    ? 'Deactivate the user'
+                                    : 'User activation',
+                                data['activeUser'] == true
+                                    ? 'Do you want to disable account activation?'
+                                    : 'Do you want to activate the account?',
+                                showButtom: true, noFunction: () {
+                              Navigator.pop(context);
+                            }, yesFunction: () async {
+                              Navigator.pop(context);
+
+                              await Database.updateActiveUser(
+                                  docId: snapshot.data.docs[i].id,
+                                  activeUser: data['activeUser'] == true
+                                      ? false
+                                      : true);
+                            });
                           },
                           child: Icon(
-                            AppIcons.active,
+                            data['activeUser'] == true
+                                ? AppIcons.unActive
+                                : AppIcons.active,
                             size: 60.spMin,
-                            color: AppColor.activeColor,
+                            color: data['activeUser'] == true
+                                ? AppColor.activeColor
+                                : AppColor.unActiveColor,
                           ),
                         ),
 //name icon==================================================================================================

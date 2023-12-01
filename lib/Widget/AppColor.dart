@@ -8,6 +8,8 @@ class AppColor {
   static Color labelTextFieldsColor = Colors.grey.shade800;
   static Color appBarColor = const Color(0xFF696867);
   static Color mainTextFieldsColor = Colors.black;
+  static Color activeColor = Colors.green;
+  static Color unActiveColor = Colors.grey;
   static Color white30 = Colors.white30;
   static Color mainColor = const Color(0xffececec);
   static Color errorColor = Colors.red;
@@ -17,5 +19,5 @@ class AppColor {
   static Color buttonsTextColor =white;
   static Color noColor =Colors.transparent;
   static Color opacityFillColor =Colors.black12;
-  static Color activeColor = Colors.green;
+
 }
