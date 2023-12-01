@@ -146,6 +146,9 @@ class _ViewTherapistState extends State<ViewTherapist> {
 
                               await Database.updateActiveUser(
                                   docId: snapshot.data.docs[i].id,
+                                
+                            userId:data['userId'],
+                            type:data['type'],
                                   activeUser: data['activeUser'] == true
                                       ? false
                                       : true);
