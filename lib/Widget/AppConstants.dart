@@ -4,7 +4,7 @@ class AppConstants {
   static CollectionReference userCollection =
       FirebaseFirestore.instance.collection('users');
   static CollectionReference exerciseCollection =
-  FirebaseFirestore.instance.collection('exercises');
+  FirebaseFirestore.instance.collection('plan');
 
   static String typeIsTherapist = 'therapist';
   static String typeIsPatient = 'patient';
