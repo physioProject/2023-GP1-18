@@ -37,12 +37,25 @@ class AppValidator {
   }
 
 
-//valid Password data============================================================
+//valid Password data==============================================================
   static String? validatorPassword(pass) {
     if (pass.isEmpty) {
       return AppMessage.mandatoryTx ;
     }
-    if (pass.length < 6) {
+    // Check for at least one uppercase letter
+    if (!RegExp(r'[A-Z]').hasMatch(pass)) {
+      return 'Password must contain at least one uppercase letter';
+    }
+    // Check for at least one digit
+    if (!RegExp(r'\d').hasMatch(pass)) {
+      return 'Password must contain at least one digit';
+    }
+    // Check for at least one special character
+    if (!RegExp(r'[!@#$%^&*(),_ -.?":{}|<>]').hasMatch(pass)) {
+      return 'Password must contain at least one special character';
+    }
+
+    if (pass.length < 8) {
       return AppMessage.invalidPassword ;
     } else {
       return null;
