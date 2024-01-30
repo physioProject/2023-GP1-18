@@ -325,13 +325,13 @@ class Database {
         int planCount = await countPlans(userId);
         String planName = 'plan${planCount + 1}';
         QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('exercises')
+            .collection('plan')
             .where('planName', isEqualTo: planName)
             .where('userId', isEqualTo: userId)
             .where('finishDate', isEqualTo: finishDate)
             .get();
         if (snapshot.docs.isEmpty) {
-          DocumentReference planRef = await FirebaseFirestore.instance.collection('exercises').add({
+          DocumentReference planRef = await FirebaseFirestore.instance.collection('plan').add({
             'planName': planName,
             'exercise': exercise,
             'finishDate': finishDate,
@@ -339,7 +339,7 @@ class Database {
             'userId': userId,
             'duration': duration,
           });
-          await FirebaseFirestore.instance.collection('exercises').doc(planRef.id).update({
+          await FirebaseFirestore.instance.collection('plan').doc(planRef.id).update({
             'planId': planRef.id,
           });
           return 'done';
@@ -355,7 +355,7 @@ class Database {
  static Future<int> countPlans(String userId) async {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('exercises')
+          .collection('plan')
           .where('userId', isEqualTo: userId)
           .get();
 
@@ -423,7 +423,7 @@ static Future<String> updateActiveUser(
     try {
       // Your update logic goes here
       // For example, if you are using Firestore:
-      await FirebaseFirestore.instance.collection('exercises').doc(exerciseId).update(data);
+      await FirebaseFirestore.instance.collection('plan').doc(exerciseId).update(data);
     } catch (e) {
       print('Error updating exercise: $e');
       // Handle errors as needed
@@ -456,5 +456,7 @@ static Future<String> updateActiveUser(
     }
   }
 }
+
+
 
 
