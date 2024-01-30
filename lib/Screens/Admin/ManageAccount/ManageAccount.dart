@@ -159,6 +159,8 @@ class _ManageAccountState extends State<ManageAccount> {
                        },
                        hintText: 'Therapists list',
                        dropValue: selectedTherapists[patientId],
+                       isMultiSelect: false, // تم تفعيل الاختيار المتعدد
+                       multiSelectSeparator: ", ", // فاصلة ومسافة بين العناصر المحددة
                      ),
                    ),
                  ),
@@ -176,4 +178,5 @@ class _ManageAccountState extends State<ManageAccount> {
 
 
 }
+
 
