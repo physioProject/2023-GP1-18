@@ -1,6 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'AppColor.dart';
 import 'AppSize.dart';
 import 'AppText.dart';
@@ -21,7 +22,7 @@ class AppDropList extends StatelessWidget {
       required this.onChanged,
       required this.dropValue,
       this.friezeText,
-      this.fillColor})
+      this.fillColor, required String multiSelectSeparator, required bool isMultiSelect})
       : super(key: key);
 
   @override
@@ -91,3 +92,4 @@ class AppDropList extends StatelessWidget {
     );
   }
 }
+
