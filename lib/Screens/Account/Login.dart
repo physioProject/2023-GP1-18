@@ -32,6 +32,8 @@ class _LoginState extends State<Login> {
   String? selectedType;
 
   var patientId;
+  int failedAttempts = 0;
+  bool isAccountLocked = false;
   @override
   void initState() {
     super.initState();
@@ -82,6 +84,8 @@ class _LoginState extends State<Login> {
                   hintText: AppMessage.type,
                   dropValue: selectedType,
                   fillColor: AppColor.opacityFillColor,
+                  isMultiSelect: false,
+                  multiSelectSeparator: ", ",
                 ),
                 SizedBox(
                   height: 20.h,
@@ -148,6 +152,7 @@ class _LoginState extends State<Login> {
                   bagColor: AppColor.iconColor,
                   onPressed: () async {
                     FocusManager.instance.primaryFocus?.unfocus();
+
                     if (logKey.currentState?.validate() == true) {
                       AppLoading.show(context, '', 'lode');
                       Database.loggingToApp(
@@ -223,4 +228,5 @@ class _LoginState extends State<Login> {
     );
   }
 }
+
 
