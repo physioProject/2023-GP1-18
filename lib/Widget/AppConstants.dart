@@ -25,8 +25,9 @@ class AppConstants {
     'Shoulder front raise level2',
     'Shoulder side raise level1',
     'Shoulder side raise level2',
-    'Shoulder external rotation level1',
-    'Shoulder external rotation level2'
+    'Curl level1',
+    'Curl level2'
   ];
   static List<String> typeMenu = ['admin', 'patient', 'therapist'];
 }
+
