@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../../../Database/Database.dart';
 import '../../../Widget/AppBar.dart';
 import '../../../Widget/AppButtons.dart';
@@ -14,6 +17,7 @@ import '../../../Widget/AppMessage.dart';
 import '../../../Widget/AppTextFields.dart';
 import '../../../Widget/AppValidator.dart';
 import '../../../Widget/AppText.dart';
+
 
 class UpdatePatient extends StatefulWidget {
   final String docId;
@@ -51,7 +55,9 @@ class _UpdatePatientState extends State<UpdatePatient> {
   GlobalKey<FormState> updateKey = GlobalKey();
   String? selectedCondition;
   DateTime? selectedDateOfBirth;
-
+  List<MultiSelectItem<Object?>> convertToMultiSelectItems(List<String> listItem) {
+    return listItem.map((item) => MultiSelectItem<Object?>(item, item)).toList();
+  }
   static const String dateOfBirthLabel = 'Date of Birth';
 
   @override
@@ -161,8 +167,8 @@ class _UpdatePatientState extends State<UpdatePatient> {
               SizedBox(
                 height: 10.h,
               ),
-              AppDropList(
-                listItem: AppConstants.conditionMenu,
+              MultiSelectDialogField(
+                items: convertToMultiSelectItems(AppConstants.conditionMenu),
                 validator: (v) {
                   if (v == null) {
                     return AppMessage.mandatoryTx;
@@ -170,14 +176,26 @@ class _UpdatePatientState extends State<UpdatePatient> {
                     return null;
                   }
                 },
-                onChanged: (selectedItem) {
+                onConfirm: (List<Object?>? selectedItems) {
                   setState(() {
-                    selectedCondition = selectedItem;
+                    selectedCondition = selectedItems?.cast<String>().join(", ");
                   });
                   print('selectedCondition: $selectedCondition');
                 },
-                hintText: selectedCondition,
-                dropValue: selectedCondition,
+                buttonText: Text('Select Condition'),
+                title: Text('Select Condition'),
+                initialValue: selectedCondition?.split(", ")?.where((item) => item != null).map<Object?>((e) => e).toList() ?? [],
+                searchable: true,
+                selectedItemsTextStyle: TextStyle(fontSize: 14.0 ,color: Colors.black),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6.0),
+
+                  color: Colors.white,
+                ),chipDisplay: MultiSelectChipDisplay(chipColor: Colors.white,textStyle: TextStyle(color: Colors.black)),
+                buttonIcon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.black,
+                ),
               ),
               SizedBox(
                 height: 10.h,
@@ -234,4 +252,5 @@ class _UpdatePatientState extends State<UpdatePatient> {
     );
   }
 }
+
 
