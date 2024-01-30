@@ -11,10 +11,11 @@ class AppMessage {
   static String PatientInfo = 'Patient Info';
   static String PatientPlan = 'Customized Plan';
   static String myPlan = 'My Plan';
+  static String repeat = 'Repeat';
   static String PatientReport = 'Report';
   static String duration = 'Duration';
   static String fullName = 'Full Name';
-  static String Addingexercise = 'Adding exercise';
+  static String AddingPlan = 'Adding New Plan';
   static String singUpTx = 'Sign Up';
   static String noHaveAccountTx = 'No have Account?';
   static String firstName = 'First Name';
@@ -62,3 +63,4 @@ class AppMessage {
   static String send = 'send';
   static String emailFormat = 'Email Format';
 }
+
