@@ -86,7 +86,7 @@ class _RepeatState extends State<Repeat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget(text:   'Update Plan',
+      appBar: AppBarWidget(text:   'Repeat Plan',
 
       ),
       body: Form(
