@@ -3,10 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server/gmail.dart';
+
 import 'package:physio/Screens/Therapist/UpdateExercise.dart';
+import 'package:physio/Screens/Therapist/Repeat.dart';
+import 'package:sendgrid_mailer/sendgrid_mailer.dart';
 import '../Widget/AppConstants.dart';
+
 
 class Database {
   static final GoogleSignIn _googleSignIn =
@@ -212,24 +214,18 @@ class Database {
 
   //=============================send password to user email=================================================
   static Future sendPasswordToUser({required Map<String, dynamic> data}) async {
-    final user = await _googleSignIn.signIn();
-    if (user == null) {
-      return;
-    }
-    String email = user.email;
-    final auth = await user.authentication;
-    final String token = auth.accessToken!;
-    final smtpServer = gmailSaslXoauth2(email, token);
-    final message = Message()
-      ..from = Address(email, 'Physio app')
-      ..recipients.add(data['email'])
-      ..subject = 'Hello ${data['firstName'] + ' ' + data['lastName']}'
-      ..text = 'Your password is ${data['password']}';
+    final mailer=Mailer('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');
+    final toAddress = Address(data['email']);
+    final fromAddress = Address('ljyn8555@gmail.com');
+    final content  = Content('text/plain', 'Your password is ${data['password']}');
+    final subject = 'Hello ${data['firstName'] + ' ' + data['lastName']}';
+    final personalization = Personalization([toAddress]);
+    final email =Email([personalization],fromAddress,subject,content: [content]);
 
     try {
-      await send(message, smtpServer);
+      await mailer.send(email);
       return 'done';
-    } on MailerException catch (e) {
+    }  catch (e) {
       return 'error';
     }
   }
@@ -314,29 +310,69 @@ class Database {
     }
   }
 
-  //=======================AddNewExercise ======================================
+ //=======================AddNewExercise ======================================
   static Future<String> AddNewExercise(
+
       {required String exercise,
+
         required String startDate,
         required String finishDate,
         required String userId,
-        required String duration}) async {
+        required String duration
+      }) async {
     try {
-      {
-        await AppConstants.exerciseCollection.add({
-          'exercise': exercise,
-          'finishDate': finishDate,
-          'startDate': startDate,
-          'userId': userId,
-          'duration': duration,
-        });
-        return 'done';
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        int planCount = await countPlans(userId);
+        String planName = 'plan${planCount + 1}';
+
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('exercises')
+            .where('planName', isEqualTo: planName)
+            .where('userId', isEqualTo: userId)
+            .where('finishDate', isEqualTo: finishDate)
+            .get();
+
+        if (snapshot.docs.isEmpty) {
+          DocumentReference planRef = await FirebaseFirestore.instance.collection('plans').add({
+            'planName': planName,
+            'userId': userId,
+          });
+
+          await FirebaseFirestore.instance.collection('exercises').add({
+            'planName': planName,
+            'exercise': exercise,
+            'finishDate': finishDate,
+            'startDate': startDate,
+            'userId': userId,
+            'planId': planRef.id,
+            'duration': duration,
+          });
+
+          return 'done';
+        } else {
+          return 'Exercise already exists for the specified plan, user, and finish date';
+        }
       }
-    } on FirebaseException catch (e) {
     } catch (e) {
       return e.toString();
     }
+
     return 'error';
+  }
+ static Future<int> countPlans(String userId) async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('exercises')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      return snapshot.docs.length;
+    } catch (e) {
+      print(e.toString());
+      return 0;
+    }
   }
 //=======================Active user======================================
 static Future<String> updateActiveUser(
@@ -377,7 +413,7 @@ static Future<String> updateActiveUser(
     }
   }
 //=======================Get Exercise Details ======================================
-  static Future<Map<String, dynamic>?> getExerciseDetails(String exerciseId) async {
+  static Future<Map<String, dynamic>?> getExerciseDetails(String exerciseId, String patientId) async {
     try {
       DocumentSnapshot exerciseSnapshot = await AppConstants.exerciseCollection.doc(exerciseId).get();
 
@@ -404,14 +440,26 @@ static Future<String> updateActiveUser(
     }
   }
   //========================Navigate to update
-  static void navigateToUpdateExercise(BuildContext context, String exerciseId) async {
-    Map<String, dynamic>? exerciseDetails = await Database.getExerciseDetails(exerciseId);
+  static void navigateToUpdateExercise(BuildContext context, String exerciseId,String patientId) async {
+    Map<String, dynamic>? exerciseDetails = await Database.getExerciseDetails(exerciseId,patientId);
 
     if (exerciseDetails != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => UpdateExercise(exerciseId: exerciseId),
+          builder: (context) => UpdateExercise(exerciseId: exerciseId,patientId: patientId,),
+        ),
+      );
+    }
+  }
+  static void navigateToRepaet(BuildContext context, String exerciseId,String patientId) async {
+    Map<String, dynamic>? exerciseDetails = await Database.getExerciseDetails(exerciseId,patientId);
+
+    if (exerciseDetails != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Repeat(exerciseId: exerciseId,patientId:patientId),
         ),
       );
     }
