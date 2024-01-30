@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:physio/Widget/generalWidget.dart';
 import '../../../Database/Database.dart';
 import '../../../Widget/AppBar.dart';
@@ -32,7 +35,9 @@ class _AddNewPatientState extends State<AddNewPatient> {
   String? selectedCondition;
   String? generatedPassword;
   String? docId;
-
+  List<MultiSelectItem<Object?>> convertToMultiSelectItems(List<String> listItem) {
+    return listItem.map((item) => MultiSelectItem<Object?>(item, item)).toList();
+  }
   static const String dateOfBirthLabel = 'Date of Birth';
 
   @override
@@ -132,27 +137,40 @@ class _AddNewPatientState extends State<AddNewPatient> {
               SizedBox(
                 height: 10.h,
               ),
-              AppDropList(
-                listItem: AppConstants.conditionMenu,
-                validator: (v) {
-                  if (v == null) {
-                    return AppMessage.mandatoryTx;
-                  } else {
-                    return null;
-                  }
-                },
-                onChanged: (selectedItem) {
-                  setState(() {
-                    selectedCondition = selectedItem;
-                  });
-                  print('selectedCondition: $selectedCondition');
-                },
-                hintText: AppMessage.condition,
-                dropValue: selectedCondition,
-              ),
-              SizedBox(
+          MultiSelectDialogField(
+            items: convertToMultiSelectItems(AppConstants.conditionMenu),
+            validator: (v) {
+              if (v == null) {
+                return AppMessage.mandatoryTx;
+              } else {
+                return null;
+              }
+            },
+            onConfirm: (List<Object?>? selectedItems) {
+              setState(() {
+                selectedCondition = selectedItems?.cast<String>().join(", ");
+              });
+              print('selectedCondition: $selectedCondition');
+            },
+            buttonText: Text('Select Condition'),
+            title: Text('Select Condition'),
+            initialValue: selectedCondition?.split(", ")?.where((item) => item != null).map<Object?>((e) => e).toList() ?? [],
+            searchable: true,
+            selectedItemsTextStyle: TextStyle(fontSize: 14.0 ,color: Colors.black),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6.0),
+
+              color: Colors.white,
+            ),chipDisplay: MultiSelectChipDisplay(chipColor: Colors.white,textStyle: TextStyle(color: Colors.black)),
+            buttonIcon: Icon(
+              Icons.arrow_drop_down,
+              color: Colors.black,
+            ),
+          ),
+      SizedBox(
                 height: 10.h,
               ),
+
               //==============================Add Button===============================================================
               AppButtons(
                 text: AppMessage.add,
