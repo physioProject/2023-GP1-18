@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:physio/Screens/Patient/patientExercise.dart';
 import '../../Database/Database.dart';
 import '../../Widget/AppButtons.dart';
 import '../../Widget/AppIcons.dart';
 import '../../Widget/AppImage.dart';
+
+import 'package:physio/Screens/Therapist/TherapistHome.dart';
 import '../../../Widget/AppBar.dart';
 import '../../../Widget/AppMessage.dart';
 import '../../Widget/AppColor.dart';
@@ -35,17 +38,16 @@ class _PatientPlanViewState extends State<PatientPlanView> {
 
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-  appBar: AppBarWidget(text: AppMessage.myPlan,
-
+    return Scaffold(
+      appBar: AppBarWidget(
+        text: AppMessage.myPlan,
         leading: AppPopUpMen(
           icon: CircleAvatar(
             backgroundColor: AppColor.black,
             child: Icon(AppIcons.menu),
           ),
           menuList: AppWidget.itemList(
-            onTapChangePass: () =>
-                AppRoutes.pushTo(context, const ChangePass()),
+            onTapChangePass: () => AppRoutes.pushTo(context, const ChangePass()),
             isChangePassword: true,
             helloName: 'Hello Patient ${widget.name}',
             action: () {
@@ -55,32 +57,35 @@ class _PatientPlanViewState extends State<PatientPlanView> {
           ),
         ),
       ),
-
       body: StreamBuilder(
-          stream: AppConstants.exerciseCollection
-              .where('userId', isEqualTo:widget.patientId)
-              .where('finishDate', isGreaterThan: DateTime.now().toString())
-              .orderBy('finishDate')
-              .snapshots(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.hasError) {
-              return Center(child: Text('${snapshot.error}'));
-            }
-            if (snapshot.hasData) {
-              return body(context, snapshot);
-            }
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }));
+        stream: AppConstants.exerciseCollection
+            .where('userId', isEqualTo: widget.patientId)
+            .where('finishDate', isGreaterThan: DateTime.now().toString())
+            .orderBy('finishDate')
+            .snapshots(),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('${snapshot.error}'));
+          }
+          if (snapshot.hasData) {
+            return body(context, snapshot);
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
   }
-//=======================================================================
+
   Widget body(context, snapshot) {
     return snapshot.data.docs.length > 0
         ? ListView.builder(
       itemCount: snapshot.data.docs.length,
       itemBuilder: (context, i) {
         var data = snapshot.data.docs[i].data();
+
+
         return Padding(
           padding: EdgeInsets.symmetric(vertical: 5.h),
           child: SizedBox(
@@ -90,47 +95,59 @@ class _PatientPlanViewState extends State<PatientPlanView> {
               elevation: 5,
               child: Center(
                 child: ListTile(
-
                   tileColor: AppColor.white,
-                  leading:  CircleAvatar(
+                  leading: CircleAvatar(
                     radius: 25.sp,
                     child: ClipOval(
                       child: Image(
                         image: exerciseImg,
                         fit: BoxFit.cover,
-
                       ),
                     ),
                   ),
-
                   trailing: SizedBox(
-        width: 70,
-        height: 30,
-
-                    child: AppButtons(
-                      onPressed: () {},
-                      text: 'Start',
-                      bagColor:Colors.green,
-                    ),
+                    width: 70,
+                    height: 30,
+                  ),onTap: () {
+        var selectedPlan=snapshot.data.docs[i].data()['planId'];
+        AppRoutes.pushTo(
+        context,
+        patientExercise(planId: selectedPlan),
+        );
+        },
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Plan Name:', // Header text
+                        style: TextStyle(
+                          fontSize: AppSize.subTextSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 5), // Add spacing
+                      Text(
+                        data['planName'].toString(),
+                        style: TextStyle(
+                          fontSize: AppSize.subTextSize,
+                        ),
+                      ),
+                    ],
                   ),
-
-                title: AppText(
-                    text: data['exercise'] ,
-                    fontSize: AppSize.subTextSize,
-                  ),
-
                 ),
+
               ),
             ),
           ),
+
         );
       },
     )
+
         : Center(
       child: AppText(
           text: AppMessage.noData,
           fontSize: AppSize.subTextSize,
           fontWeight: FontWeight.bold),
     );
-  }
-}
+  }}
