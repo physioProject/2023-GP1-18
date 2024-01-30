@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../Widget/AppButtons.dart';
 import '../../Widget/AppImage.dart';
 import '../../../Widget/AppBar.dart';
 import '../../../Widget/AppMessage.dart';
@@ -13,6 +14,7 @@ import 'package:physio/Screens/Therapist/AddNewExercise.dart';
 import '../../Widget/AppSize.dart';
 import '../../Widget/AppText.dart';
 import 'package:physio/Screens/Therapist/UpdateExercise.dart';
+import 'package:physio/Screens/Therapist/Repeat.dart';
 class ViewPatientPlan extends StatefulWidget {
   final String PatientId;
 
@@ -48,17 +50,46 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
     );
   }
 
-  void navigateToUpdateExercise(String documentId) {
-    AppRoutes.pushTo(context, UpdateExercise(exerciseId: documentId));
+  void navigateToUpdateExercise(String documentId, String patientId) {
+    AppRoutes.pushTo(context, UpdateExercise(exerciseId: documentId,patientId:patientId,));
   }
+  void navigateToRepeat(String documentId,String patientId) {
+    AppRoutes.pushTo(context, Repeat(exerciseId: documentId,patientId: patientId,));
+  }
+  Widget body(BuildContext context, AsyncSnapshot<QuerySnapshot>? snapshot) {
+    if (snapshot == null ||!snapshot.hasData||  snapshot.data == null) {
+      return Center(
+        child: AppText(
+          text: AppMessage.noData,
+          fontSize: AppSize.subTextSize,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
 
-  Widget body(context, snapshot) {
-    return snapshot.data.docs.length > 0
+    var dataDocs = snapshot.data!.docs;
+    return dataDocs.length > 0
         ? ListView.builder(
-      itemCount: snapshot.data.docs.length,
+      itemCount: dataDocs.length,
       itemBuilder: (context, i) {
-        var data = snapshot.data.docs[i].data();
-        var documentId = snapshot.data.docs[i].id;
+        var data = dataDocs[i].data() as Map<String, dynamic>;
+        var documentId = dataDocs[i].id;
+        var finishDate;
+        var isExerciseFinished = false;
+
+        try {
+          finishDate = DateTime.parse(data['finishDate'].toString());
+          isExerciseFinished = finishDate.isBefore(DateTime.now());
+        } catch (error) {
+          print('Error parsing finishDate: $error');
+        }
+
+        var exerciseImage = Image(
+          image: exerciseImg,
+          fit: BoxFit.cover,
+          color: isExerciseFinished ? Colors.grey : null,
+          colorBlendMode: BlendMode.saturation,
+        );
 
         return Padding(
           padding: EdgeInsets.symmetric(vertical: 5.h),
@@ -73,14 +104,21 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
                   leading: CircleAvatar(
                     radius: 30.sp,
                     child: ClipOval(
-                      child: Image(
-                        image: exerciseImg,
-                        fit: BoxFit.cover,
-
-                      ),
+                      child: exerciseImage,
                     ),
                   ),
-                  trailing: InkWell(
+                  trailing: isExerciseFinished ? SizedBox(
+                    width: 90,
+                    height: 30,
+                    child: AppButtons(
+                      onPressed: () {
+                        navigateToRepeat(documentId,widget.PatientId);
+
+                      },
+                      text: 'Repeat',
+                      bagColor: Colors.green,
+                    ),
+                  ) : InkWell(
                     onTap: () {
                       showDeleteConfirmationDialog(documentId);
                     },
@@ -92,13 +130,29 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
                   ),
                   title: InkWell(
                     onTap: () {
-                      navigateToUpdateExercise(documentId);
+                      navigateToUpdateExercise(documentId,widget.PatientId);
                     },
-                    child: AppText(
-                      text: data['exercise'],
-                      fontSize: AppSize.subTextSize,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Plan Name:', // Header text
+                          style: TextStyle(
+                            fontSize: AppSize.subTextSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 5), // Add spacing
+                        Text(
+                          data['planName'].toString(),
+                          style: TextStyle(
+                            fontSize: AppSize.subTextSize,
+                          ),
+                        ),
+                      ],
                     ),
-                      ),
+                  ),
+
                 ),
               ),
             ),
@@ -114,7 +168,6 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,8 +184,8 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
       body: StreamBuilder(
         stream: AppConstants.exerciseCollection
             .where('userId', isEqualTo: widget.PatientId)
-            .where('finishDate', isGreaterThan: DateTime.now().toString())
-            .orderBy('finishDate')
+
+            .orderBy('finishDate', descending: true)
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
@@ -149,3 +202,4 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
     );
   }
 }
+
