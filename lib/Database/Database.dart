@@ -312,9 +312,8 @@ class Database {
 
  //=======================AddNewExercise ======================================
   static Future<String> AddNewExercise(
-
-      {required String exercise,
-
+      {
+        required String exercise,
         required String startDate,
         required String finishDate,
         required String userId,
@@ -322,34 +321,27 @@ class Database {
       }) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-
       if (user != null) {
         int planCount = await countPlans(userId);
         String planName = 'plan${planCount + 1}';
-
         QuerySnapshot snapshot = await FirebaseFirestore.instance
             .collection('exercises')
             .where('planName', isEqualTo: planName)
             .where('userId', isEqualTo: userId)
             .where('finishDate', isEqualTo: finishDate)
             .get();
-
         if (snapshot.docs.isEmpty) {
-          DocumentReference planRef = await FirebaseFirestore.instance.collection('plans').add({
-            'planName': planName,
-            'userId': userId,
-          });
-
-          await FirebaseFirestore.instance.collection('exercises').add({
+          DocumentReference planRef = await FirebaseFirestore.instance.collection('exercises').add({
             'planName': planName,
             'exercise': exercise,
             'finishDate': finishDate,
             'startDate': startDate,
             'userId': userId,
-            'planId': planRef.id,
             'duration': duration,
           });
-
+          await FirebaseFirestore.instance.collection('exercises').doc(planRef.id).update({
+            'planId': planRef.id,
+          });
           return 'done';
         } else {
           return 'Exercise already exists for the specified plan, user, and finish date';
@@ -358,7 +350,6 @@ class Database {
     } catch (e) {
       return e.toString();
     }
-
     return 'error';
   }
  static Future<int> countPlans(String userId) async {
