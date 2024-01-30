@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:physio/Screens/Therapist/ViewPatientPlan.dart';
+
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:physio/Widget/AppTextFields.dart';
 import '../../../Widget/AppBar.dart';
 import '../../../Database/Database.dart';
@@ -11,6 +15,7 @@ import '../../Widget/AppColor.dart';
 import '../../Widget/AppConstants.dart';
 import '../../Widget/AppDropList.dart';
 import '../../Widget/AppLoading.dart';
+
 
 class AddNewExercise extends StatefulWidget {
   final String PatientId;
@@ -27,7 +32,10 @@ class _AddNewExerciseState extends State<AddNewExercise> {
   TextEditingController startDateController = TextEditingController();
   TextEditingController finishDateController = TextEditingController();
   TextEditingController durationController = TextEditingController();
-
+  TextEditingController PlanController = TextEditingController();
+  List<MultiSelectItem<Object?>> convertToMultiSelectItems(List<String> listItem) {
+    return listItem.map((item) => MultiSelectItem<Object?>(item, item)).toList();
+  }
   @override
   void dispose() {
     startDateController.dispose();
@@ -48,7 +56,7 @@ class _AddNewExerciseState extends State<AddNewExercise> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget(text: AppMessage.Addingexercise),
+      appBar: AppBarWidget(text: AppMessage.AddingPlan),
       body: Form(
         key: addKey,
         child: Padding(
@@ -187,24 +195,36 @@ class _AddNewExerciseState extends State<AddNewExercise> {
          , SizedBox(
           height: 10.h,
         ),
-    AppDropList(
-    listItem: AppConstants.ExerciseList,
-    validator: (v) {
-    if (v == null) {
-    return AppMessage.mandatoryTx;
-    } else {
-    return null;
-    }
-    },
-    onChanged: (selectedItem) {
-    setState(() {
-    selectedExercise = selectedItem;
-    });
-    print('selectedCondition: $selectedExercise');
-    },
-    hintText: AppMessage.exerciseList,
-    dropValue: selectedExercise,
-    ),
+          MultiSelectDialogField(
+                items: convertToMultiSelectItems(AppConstants.ExerciseList),
+                validator: (v) {
+                  if (v == null) {
+                    return AppMessage.mandatoryTx;
+                  } else {
+                    return null;
+                  }
+                },
+                onConfirm: (List<Object?>? selectedItems) {
+                  setState(() {
+                    selectedExercise = selectedItems?.cast<String>().join(", ");
+                  });
+                  print('selectedexercise: $selectedExercise');
+                },
+                buttonText:Text('selectedExercise'),
+                title: Text('Select Exercise'),
+                initialValue: selectedExercise?.split(", ")?.where((item) => item != null).map<Object?>((e) => e).toList() ?? [],
+                searchable: true,
+                selectedItemsTextStyle: TextStyle(fontSize: 14.0 ,color: Colors.black),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6.0),
+
+                  color: Colors.white,
+                ),chipDisplay: MultiSelectChipDisplay(chipColor: Colors.white,textStyle: TextStyle(color: Colors.black)),
+                buttonIcon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.black,
+                ),
+              ),
     SizedBox(
     height: 10.h,
     ),
@@ -216,6 +236,7 @@ class _AddNewExerciseState extends State<AddNewExercise> {
           if (addKey.currentState?.validate() == true) {
             // add operation
             Database.AddNewExercise(
+
               exercise: selectedExercise!,
 startDate:startDateController.text,
               finishDate: finishDateController.text,
@@ -234,11 +255,13 @@ startDate:startDateController.text,
           }
         },
       ),
-                ],
+          ],
              ),
             ),
           ),
         );
        }
      }
+
+
 
