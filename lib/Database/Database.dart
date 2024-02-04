@@ -311,60 +311,57 @@ class Database {
   }
 
  //=======================AddNewExercise ======================================
-  static Future<String> AddNewExercise(
-      {
-        required String exercise,
-        required String startDate,
-        required String finishDate,
-        required String userId,
-        required String duration
-      }) async {
+  import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class ExerciseManager {
+  static Future<String> addNewExercise({
+    required String exercise,
+    required String startDate,
+    required String finishDate,
+    required String userId,
+    required String duration,
+  }) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         int planCount = await countPlans(userId);
         String planName = 'plan${planCount + 1}';
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('plan')
-            .where('planName', isEqualTo: planName)
-            .where('userId', isEqualTo: userId)
-            .where('finishDate', isEqualTo: finishDate)
-            .get();
-        if (snapshot.docs.isEmpty) {
-          DocumentReference planRef = await FirebaseFirestore.instance.collection('plan').add({
-            'planName': planName,
-            'exercise': exercise,
-            'finishDate': finishDate,
-            'startDate': startDate,
-            'userId': userId,
-            'duration': duration,
-          });
-          await FirebaseFirestore.instance.collection('plan').doc(planRef.id).update({
-            'planId': planRef.id,
-          });
-          return 'done';
-        } else {
-          return 'Exercise already exists for the specified plan, user, and finish date';
-        }
+        
+        DocumentReference planRef = await FirebaseFirestore.instance.collection('plan').add({
+          'planName': planName,
+          'exercise': exercise,
+          'finishDate': finishDate,
+          'startDate': startDate,
+          'userId': userId,
+          'duration': duration,
+        });
+        
+        await FirebaseFirestore.instance.collection('plan').doc(planRef.id).update({
+          'planId': planRef.id,
+        });
+        
+        return 'done';
       }
     } catch (e) {
       return e.toString();
     }
     return 'error';
   }
- static Future<int> countPlans(String userId) async {
+
+  static Future<int> countPlans(String userId) async {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('plan')
           .where('userId', isEqualTo: userId)
           .get();
-
       return snapshot.docs.length;
     } catch (e) {
       print(e.toString());
       return 0;
     }
   }
+}
 //=======================Active user======================================
 static Future<String> updateActiveUser(
       {required String docId, required bool activeUser,   userId,
