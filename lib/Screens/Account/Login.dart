@@ -213,7 +213,7 @@ class _LoginState extends State<Login> {
                                   .collection('users')
                                   .where('userId', isEqualTo: v)
                                   .get()
-                                  .then((typeFromDB) {
+                                  .then((typeFromDB) async {
                                   Navigator.pop(context);
                                   for (var element in typeFromDB.docs) {
                                     if (element.data()['type'] ==
@@ -263,10 +263,36 @@ class _LoginState extends State<Login> {
                                             context, const AdminHome());
                                       }
                                     } else {
-                                      AppLoading.show(
-                                          context,
-                                          AppMessage.loginTx,
-                                          AppMessage.userNotFound);
+                                      getLogCounter =
+                                          await DatabaseHelper.getLogCounter();
+                                      print(
+                                          'Counterققققق length is: ${getLogCounter.length}');
+                                      getLogCounter.isEmpty
+                                          ? await DatabaseHelper.addLogCounter(
+                                              1)
+                                          : await DatabaseHelper
+                                              .updateLogCounter(getLogCounter
+                                                      .first['logCont'] +
+                                                  1);
+                                      print('getLogCounter is: $getLogCounter');
+
+                                      ///if user login mor than 3 time will block
+                                      if (getLogCounter.isNotEmpty) {
+                                        getLogCounter.first['logCont'] >= 3
+                                            ? AppLoading.show(
+                                                context,
+                                                AppMessage.loginTx,
+                                                AppMessage.exceededLoginLimit)
+                                            : AppLoading.show(
+                                                context,
+                                                AppMessage.loginTx,
+                                                AppMessage.userNotFound);
+                                      } else {
+                                        AppLoading.show(
+                                            context,
+                                            AppMessage.loginTx,
+                                            AppMessage.userNotFound);
+                                      }
                                     }
                                   }
                                 });
