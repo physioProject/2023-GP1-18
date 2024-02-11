@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String text;
   final Widget? leading;
-  const AppBarWidget({Key? key, required this.text, this.leading})
+  final List<Widget>? actions;
+  const AppBarWidget({Key? key, required this.text, this.leading, this.actions})
       : super(key: key);
 
   @override
@@ -22,6 +23,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       ),
       leading: leading,
       centerTitle: true,
+      actions: actions,
     );
   }
 

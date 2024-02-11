@@ -19,5 +19,5 @@ class AppColor {
   static Color buttonsTextColor =white;
   static Color noColor =Colors.transparent;
   static Color opacityFillColor =Colors.black12;
-
+  static Color deepLightGrey = Colors.grey.shade300;
 }

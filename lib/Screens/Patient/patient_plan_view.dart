@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:physio/Screens/Notification/GetAlert.dart';
 import 'package:physio/Screens/Patient/patientExercise.dart';
 import '../../Database/Database.dart';
 import '../../Widget/AppButtons.dart';
@@ -19,6 +20,7 @@ import '../../Widget/AppText.dart';
 import '../../Widget/GeneralWidget.dart';
 import '../Account/Login.dart';
 import 'ChangePass.dart';
+import '../Notification/AddAlert.dart';
 
 class PatientPlanView extends StatefulWidget {
   final String name;
@@ -34,21 +36,26 @@ class PatientPlanView extends StatefulWidget {
 }
 
 class _PatientPlanViewState extends State<PatientPlanView> {
-  late ImageProvider exerciseImg= AssetImage(AppImage.exercise);
+  late ImageProvider exerciseImg = AssetImage(AppImage.exercise);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarWidget(
         text: AppMessage.myPlan,
-        leading: AppPopUpMen(
+        leading:
+        AppPopUpMen(
           icon: CircleAvatar(
             backgroundColor: AppColor.black,
-            child: Icon(AppIcons.menu),
+            child: Icon(AppIcons.menu,color: AppColor.white,),
           ),
           menuList: AppWidget.itemList(
-            onTapChangePass: () => AppRoutes.pushTo(context, const ChangePass()),
+            onTapChangePass: () =>
+                AppRoutes.pushTo(context, const ChangePass()),
+            onTapSetNotification: () =>
+                AppRoutes.pushTo(context, const GetAlert()),
             isChangePassword: true,
+            isShowNotification: true,
             helloName: 'Hello Patient ${widget.name}',
             action: () {
               Database.logOut();
@@ -81,73 +88,72 @@ class _PatientPlanViewState extends State<PatientPlanView> {
   Widget body(context, snapshot) {
     return snapshot.data.docs.length > 0
         ? ListView.builder(
-      itemCount: snapshot.data.docs.length,
-      itemBuilder: (context, i) {
-        var data = snapshot.data.docs[i].data();
+            itemCount: snapshot.data.docs.length,
+            itemBuilder: (context, i) {
+              var data = snapshot.data.docs[i].data();
 
-
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 5.h),
-          child: SizedBox(
-            height: 100.h,
-            width: double.maxFinite,
-            child: Card(
-              elevation: 5,
-              child: Center(
-                child: ListTile(
-                  tileColor: AppColor.white,
-                  leading: CircleAvatar(
-                    radius: 25.sp,
-                    child: ClipOval(
-                      child: Image(
-                        image: exerciseImg,
-                        fit: BoxFit.cover,
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 5.h),
+                child: SizedBox(
+                  height: 100.h,
+                  width: double.maxFinite,
+                  child: Card(
+                    elevation: 5,
+                    child: Center(
+                      child: ListTile(
+                        tileColor: AppColor.white,
+                        leading: CircleAvatar(
+                          radius: 25.sp,
+                          child: ClipOval(
+                            child: Image(
+                              image: exerciseImg,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        trailing: SizedBox(
+                          width: 70,
+                          height: 30,
+                        ),
+                        onTap: () {
+                          var selectedPlan =
+                              snapshot.data.docs[i].data()['planId'];
+                          AppRoutes.pushTo(
+                            context,
+                            patientExercise(planId: selectedPlan),
+                          );
+                        },
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Plan Name:', // Header text
+                              style: TextStyle(
+                                fontSize: AppSize.subTextSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5), // Add spacing
+                            Text(
+                              data['planName'].toString(),
+                              style: TextStyle(
+                                fontSize: AppSize.subTextSize,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  trailing: SizedBox(
-                    width: 70,
-                    height: 30,
-                  ),onTap: () {
-        var selectedPlan=snapshot.data.docs[i].data()['planId'];
-        AppRoutes.pushTo(
-        context,
-        patientExercise(planId: selectedPlan),
-        );
-        },
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Plan Name:', // Header text
-                        style: TextStyle(
-                          fontSize: AppSize.subTextSize,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 5), // Add spacing
-                      Text(
-                        data['planName'].toString(),
-                        style: TextStyle(
-                          fontSize: AppSize.subTextSize,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-
-              ),
-            ),
-          ),
-
-        );
-      },
-    )
-
+              );
+            },
+          )
         : Center(
-      child: AppText(
-          text: AppMessage.noData,
-          fontSize: AppSize.subTextSize,
-          fontWeight: FontWeight.bold),
-    );
-  }}
+            child: AppText(
+                text: AppMessage.noData,
+                fontSize: AppSize.subTextSize,
+                fontWeight: FontWeight.bold),
+          );
+  }
+}

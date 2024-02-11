@@ -6,6 +6,7 @@ import 'package:physio/Screens/Admin/AdminHome.dart';
 import 'package:physio/Widget/AppImage.dart';
 import 'package:physio/Widget/AppRoutes.dart';
 import '../../Database/Database.dart';
+import '../../Database/sqlLite.dart';
 import '../../Widget/AppButtons.dart';
 import '../../Widget/AppColor.dart';
 import '../../Widget/AppConstants.dart';
@@ -16,6 +17,7 @@ import '../../Widget/AppTextFields.dart';
 import '../../Widget/AppValidator.dart';
 import '../Patient/PatientHome.dart';
 import '../Therapist/ViewPatients.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -30,7 +32,7 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   GlobalKey<FormState> logKey = GlobalKey();
   String? selectedType;
-
+  final storage = new FlutterSecureStorage();
   var patientId;
   int failedAttempts = 0;
   bool isAccountLocked = false;
@@ -151,70 +153,123 @@ class _LoginState extends State<Login> {
                   text: AppMessage.loginTx,
                   bagColor: AppColor.iconColor,
                   onPressed: () async {
+                    List getLogCounter;
                     FocusManager.instance.primaryFocus?.unfocus();
 
                     if (logKey.currentState?.validate() == true) {
                       AppLoading.show(context, '', 'lode');
                       Database.loggingToApp(
-                        email: emailController.text.trim(),
+                        email: emailController.text,
                         password: passwordController.text,
-                      ).then((v) {
+                      ).then((v) async {
+//on error============================================================================================================
+
                         if (v == 'error') {
                           Navigator.pop(context);
                           AppLoading.show(
                               context, AppMessage.loginTx, AppMessage.error);
-                        } else if (v == 'user-not-found') {
+                        }
+//on user-not-found============================================================================================================
+                        else if (v == 'user-not-found') {
+                          // int de= await DatabaseHelper.deleteLogCounter();
+                          // print('database deleted $de');
+                          getLogCounter = await DatabaseHelper.getLogCounter();
+                          print('Counter length is: ${getLogCounter.length}');
+                          getLogCounter.isEmpty
+                              ? await DatabaseHelper.addLogCounter(1)
+                              : await DatabaseHelper.updateLogCounter(
+                                  getLogCounter.first['logCont'] + 1);
+                          print('getLogCounter is: $getLogCounter');
+                          if (!mounted) return;
                           Navigator.pop(context);
-                          AppLoading.show(context, AppMessage.loginTx,
-                              AppMessage.userNotFound);
-                        } else {
-                          FirebaseFirestore.instance
-                              .collection('users')
-                              .where('userId', isEqualTo: v)
-                              .get()
-                              .then((typeFromDB) {
-                            Navigator.pop(context);
-                            for (var element in typeFromDB.docs) {
-                              print('name is: ${element.data()['name']}');
-                              print(element.data()['type'] == selectedType);
-                              if (element.data()['type'] == selectedType &&
-                                  element.data()['activeUser'] == true) {
-                                if (element.data()['type'] ==
-                                    AppConstants.typeIsPatient) {
-                                  String patientId = element.data()['userId'];
-                                  AppRoutes.pushReplacementTo(
-                                      context,
-                                      PatientHome(
-                                        name: element.data()['firstName'] +
-                                            ' ' +
-                                            element.data()['lastName'],
-                                           patientId: patientId,
 
-                                  ));
-                                } else if (element.data()['type'] ==
-                                    AppConstants.typeIsTherapist) {
-                                  if (selectedType ==
-                                      AppConstants.typeIsTherapist) {
-                                    String therapistId =
-                                    element.data()['userId'];
-                                    AppRoutes.pushReplacementTo(context,
-                                        ViewPatients(therapistId: therapistId, name: element.data()['firstName'] +
-                                            ' ' +
-                                            element.data()['lastName'],));
-                                  } else {
-                                    AppRoutes.pushReplacementTo(context,
-                                         ViewPatients(therapistId: '',name: element.data()['firstName'] + ' ' + element.data()['lastName'],));
-                                  }
-                                } else {
-                                  AppRoutes.pushReplacementTo(
-                                      context, const AdminHome());
-                                }
-                              } else {
-                                AppLoading.show(context, AppMessage.loginTx,
+                          ///if user login mor than 3 time will block
+                          if (getLogCounter.isNotEmpty) {
+                            getLogCounter.first['logCont'] >= 3
+                                ? AppLoading.show(context, AppMessage.loginTx,
+                                    AppMessage.exceededLoginLimit)
+                                : AppLoading.show(context, AppMessage.loginTx,
                                     AppMessage.userNotFound);
-                              }
-                            }
-                          });
+                          } else {
+                            AppLoading.show(context, AppMessage.loginTx,
+                                AppMessage.userNotFound);
+                          }
+
+//IF found============================================================================================================
+                        } else {
+                          getLogCounter = await DatabaseHelper.getLogCounter();
+                          if (!mounted) return;
+
+                          ///check if user reset password or not
+                          getLogCounter.isNotEmpty
+                              ? {
+                                  print(
+                                      'getLogCounter if correct data: $getLogCounter'),
+                                  Navigator.pop(context),
+                                  AppLoading.show(context, AppMessage.loginTx,
+                                      AppMessage.exceededLoginLimit)
+                                }
+                              : FirebaseFirestore.instance
+                                  .collection('users')
+                                  .where('userId', isEqualTo: v)
+                                  .get()
+                                  .then((typeFromDB) {
+                                  Navigator.pop(context);
+                                  for (var element in typeFromDB.docs) {
+                                    if (element.data()['type'] ==
+                                            selectedType &&
+                                        element.data()['activeUser'] == true) {
+                                      if (element.data()['type'] ==
+                                          AppConstants.typeIsPatient) {
+                                        String patientId =
+                                            element.data()['userId'];
+                                        AppRoutes.pushReplacementTo(
+                                            context,
+                                            PatientHome(
+                                              name: element
+                                                      .data()['firstName'] +
+                                                  ' ' +
+                                                  element.data()['lastName'],
+                                              patientId: patientId,
+                                            ));
+                                      } else if (element.data()['type'] ==
+                                          AppConstants.typeIsTherapist) {
+                                        if (selectedType ==
+                                            AppConstants.typeIsTherapist) {
+                                          String therapistId =
+                                              element.data()['userId'];
+                                          AppRoutes.pushReplacementTo(
+                                              context,
+                                              ViewPatients(
+                                                therapistId: therapistId,
+                                                name: element
+                                                        .data()['firstName'] +
+                                                    ' ' +
+                                                    element.data()['lastName'],
+                                              ));
+                                        } else {
+                                          AppRoutes.pushReplacementTo(
+                                              context,
+                                              ViewPatients(
+                                                therapistId: '',
+                                                name: element
+                                                        .data()['firstName'] +
+                                                    ' ' +
+                                                    element.data()['lastName'],
+                                              ));
+                                        }
+                                      } else {
+                                        AppRoutes.pushReplacementTo(
+                                            context, const AdminHome());
+                                      }
+                                    } else {
+                                      AppLoading.show(
+                                          context,
+                                          AppMessage.loginTx,
+                                          AppMessage.userNotFound);
+                                    }
+                                  }
+                                });
                         }
                       });
                     }
@@ -228,5 +283,3 @@ class _LoginState extends State<Login> {
     );
   }
 }
-
-

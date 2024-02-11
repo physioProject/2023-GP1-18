@@ -22,8 +22,8 @@ class AppIcons {
   static IconData phoneNo=Icons.add_call;
   static IconData name=Icons.account_box;
   static IconData condition=Icons.airline_seat_flat;
-
-
+  static IconData activeNotification=Icons.notifications_active_sharp;
+  static IconData notactiveNotification=Icons.notifications_on_outlined;
 
 
 }

@@ -16,7 +16,7 @@ class AppSize{
   static double hSpace=11;
   static double wSpace=10;
   static double bottomPageSize=110.spMin;
-
+  static double iconSize=30.spMin;
 
 
 }

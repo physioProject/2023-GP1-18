@@ -9,7 +9,6 @@ import 'package:physio/Screens/Therapist/Repeat.dart';
 import 'package:sendgrid_mailer/sendgrid_mailer.dart';
 import '../Widget/AppConstants.dart';
 
-
 class Database {
   static final GoogleSignIn _googleSignIn =
       GoogleSignIn(scopes: ['https://mail.google.com/']);
@@ -26,7 +25,8 @@ class Database {
   }) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email.trim(), password: password);
+          .createUserWithEmailAndPassword(
+              email: email.trim(), password: password);
 
       if (userCredential.user != null) {
         await AppConstants.userCollection.add({
@@ -38,7 +38,7 @@ class Database {
           'phone': phone,
           'condition': condition,
           'therapistName': 'undefined',
-          'password':password,
+          'password': password,
           'therapistId': 'undefined',
           'type': 'patient',
           'status': 0,
@@ -61,7 +61,6 @@ class Database {
     return 'error';
   }
 
-
 //=======================therapist SingUp ======================================
   static Future<String> therapistSingUp({
     required String firstName,
@@ -74,7 +73,7 @@ class Database {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-          email: email.trim(), password: password);
+              email: email.trim(), password: password);
       if (userCredential.user != null) {
         await AppConstants.userCollection.add({
           'firstName': firstName,
@@ -82,7 +81,7 @@ class Database {
           'userId': userCredential.user?.uid,
           'email': email,
           'phone': phone,
-          'password':password,
+          'password': password,
           'type': 'therapist',
           'status': 0,
           'activeUser': true,
@@ -118,6 +117,15 @@ class Database {
       if (e.code == 'wrong-password') {
         return 'user-not-found';
       }
+      if (e.code == 'invalid-email') {
+        return 'invalid-email';
+      }
+      if (e.code == 'user-disabled') {
+        return 'user-disabled';
+      } else {
+        print('-------${e.message}---------');
+        return 'error';
+      }
     } catch (e) {
       return 'error';
     }
@@ -130,18 +138,16 @@ class Database {
   }
 
   //=======================patient SingUp ======================================
-    static Future<String> updatePatient(
+  static Future<String> updatePatient(
       {required String firstName,
-        required String lastName,
-        required String docId,
-        required String phone,
-
-        required String condition}) async {
+      required String lastName,
+      required String docId,
+      required String phone,
+      required String condition}) async {
     try {
       await AppConstants.userCollection.doc(docId).update({
         'firstName': firstName,
         'lastName': lastName,
-
         'phone': phone,
         'condition': condition,
       });
@@ -154,9 +160,9 @@ class Database {
   //changPassword===================================================================================
   static Future<String> changPassword(
       {currentUser,
-        required String email,
-        required String oldPass,
-        required String newPassword}) async {
+      required String email,
+      required String oldPass,
+      required String newPassword}) async {
     try {
       var cred = EmailAuthProvider.credential(email: email, password: oldPass);
       await currentUser!.reauthenticateWithCredential(cred).then((value) {
@@ -214,18 +220,21 @@ class Database {
 
   //=============================send password to user email=================================================
   static Future sendPasswordToUser({required Map<String, dynamic> data}) async {
-    final mailer=Mailer('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');
+    final mailer = Mailer(
+        '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');
     final toAddress = Address(data['email']);
     final fromAddress = Address('ljyn8555@gmail.com');
-    final content  = Content('text/plain', 'Your password is ${data['password']}');
+    final content =
+        Content('text/plain', 'Your password is ${data['password']}');
     final subject = 'Hello ${data['firstName'] + ' ' + data['lastName']}';
     final personalization = Personalization([toAddress]);
-    final email =Email([personalization],fromAddress,subject,content: [content]);
+    final email =
+        Email([personalization], fromAddress, subject, content: [content]);
 
     try {
       await mailer.send(email);
       return 'done';
-    }  catch (e) {
+    } catch (e) {
       return 'error';
     }
   }
@@ -239,8 +248,8 @@ class Database {
 
   static deleteAccount(BuildContext context,
       {required String docId,
-        required String userId,
-        required String type}) async {
+      required String userId,
+      required String type}) async {
     try {
       showDialog(
         context: context,
@@ -310,69 +319,75 @@ class Database {
     }
   }
 
- //=======================AddNewExercise ======================================
- 
+  //=======================AddNewExercise ======================================
   static Future<String> AddNewExercise(
- 
- {
-  required String exercise,
-  required String startDate,
-  required String finishDate,
-  required String userId,
-  required String duration,
-  }) async {
-  try {
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-  int planCount = await countPlans(userId);
-  String planName = 'plan${planCount + 1}';
-
-  DocumentReference planRef = await FirebaseFirestore.instance.collection('plan').add({
-  'planName': planName,
-  'exercise': exercise,
-  'finishDate': finishDate,
-  'startDate': startDate,
-  'userId': userId,
-  'duration': duration,
-  });
-
-  await FirebaseFirestore.instance.collection('plan').doc(planRef.id).update({
-  'planId': planRef.id,
-  });
-
-  return 'done';
-  }
-  } catch (e) {
-  return e.toString();
-  }
-  return 'error';
+      {required String exercise,
+      required String startDate,
+      required String finishDate,
+      required String userId,
+      required String duration}) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        int planCount = await countPlans(userId);
+        String planName = 'plan${planCount + 1}';
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('plan')
+            .where('planName', isEqualTo: planName)
+            .where('userId', isEqualTo: userId)
+            .where('finishDate', isEqualTo: finishDate)
+            .get();
+        if (snapshot.docs.isEmpty) {
+          DocumentReference planRef =
+              await FirebaseFirestore.instance.collection('plan').add({
+            'planName': planName,
+            'exercise': exercise,
+            'finishDate': finishDate,
+            'startDate': startDate,
+            'userId': userId,
+            'duration': duration,
+          });
+          await FirebaseFirestore.instance
+              .collection('plan')
+              .doc(planRef.id)
+              .update({
+            'planId': planRef.id,
+          });
+          return 'done';
+        } else {
+          return 'Exercise already exists for the specified plan, user, and finish date';
+        }
+      }
+    } catch (e) {
+      return e.toString();
+    }
+    return 'error';
   }
 
   static Future<int> countPlans(String userId) async {
-  try {
-  QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collection('plan')
-      .where('userId', isEqualTo: userId)
-      .get();
-  return snapshot.docs.length;
-  } catch (e) {
-  print(e.toString());
-  return 0;
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('plan')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      return snapshot.docs.length;
+    } catch (e) {
+      print(e.toString());
+      return 0;
+    }
   }
-  }
+
 //=======================Active user======================================
-static Future<String> updateActiveUser(
-      {required String docId, required bool activeUser,   userId,
-        type}) async {
+  static Future<String> updateActiveUser(
+      {required String docId, required bool activeUser, userId, type}) async {
     try {
       await AppConstants.userCollection.doc(docId).update({
         'activeUser': activeUser,
-
       });
 
-
 //=======================update therapistName ======================================
-      if (type == 'therapist'&& activeUser==false) {
+      if (type == 'therapist' && activeUser == false) {
         final querySnapshot = await FirebaseFirestore.instance
             .collection('users')
             .where('therapistId', isEqualTo: userId)
@@ -385,23 +400,26 @@ static Future<String> updateActiveUser(
             therapistName: 'undefined',
           );
         });
+      } else if (type == 'patient' && activeUser == false) {
+        await updateTherapistName(
+          docId: docId,
+          therapistId: 'undefined',
+          therapistName: 'undefined',
+        );
       }
-      else if(type == 'patient'&& activeUser==false){
-      await updateTherapistName(
-      docId: docId,
-      therapistId: 'undefined',
-      therapistName: 'undefined',
-      );}
 
       return 'done';
     } catch (e) {
       return 'error';
     }
   }
+
 //=======================Get Exercise Details ======================================
-  static Future<Map<String, dynamic>?> getExerciseDetails(String exerciseId, String patientId) async {
+  static Future<Map<String, dynamic>?> getExerciseDetails(
+      String exerciseId, String patientId) async {
     try {
-      DocumentSnapshot exerciseSnapshot = await AppConstants.exerciseCollection.doc(exerciseId).get();
+      DocumentSnapshot exerciseSnapshot =
+          await AppConstants.exerciseCollection.doc(exerciseId).get();
 
       if (exerciseSnapshot.exists) {
         return exerciseSnapshot.data() as Map<String, dynamic>?;
@@ -413,45 +431,61 @@ static Future<String> updateActiveUser(
       return null;
     }
   }
+
   //=================================Update Exercise
-  static Future<void> updateExercise(String exerciseId, Map<String, dynamic> data) async {
+  static Future<void> updateExercise(
+      String exerciseId, Map<String, dynamic> data) async {
     try {
       // Your update logic goes here
       // For example, if you are using Firestore:
-      await FirebaseFirestore.instance.collection('plan').doc(exerciseId).update(data);
+      await FirebaseFirestore.instance
+          .collection('plan')
+          .doc(exerciseId)
+          .update(data);
     } catch (e) {
       print('Error updating exercise: $e');
       // Handle errors as needed
       throw e; // Rethrow the error to notify the caller
     }
   }
+
   //========================Navigate to update
-  static void navigateToUpdateExercise(BuildContext context, String exerciseId,String patientId) async {
-    Map<String, dynamic>? exerciseDetails = await Database.getExerciseDetails(exerciseId,patientId);
+  static void navigateToUpdateExercise(
+      BuildContext context, String exerciseId, String patientId) async {
+    Map<String, dynamic>? exerciseDetails =
+        await Database.getExerciseDetails(exerciseId, patientId);
 
     if (exerciseDetails != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => UpdateExercise(exerciseId: exerciseId,patientId: patientId,),
+          builder: (context) => UpdateExercise(
+            exerciseId: exerciseId,
+            patientId: patientId,
+          ),
         ),
       );
     }
   }
-  static void navigateToRepaet(BuildContext context, String exerciseId,String patientId) async {
-    Map<String, dynamic>? exerciseDetails = await Database.getExerciseDetails(exerciseId,patientId);
+
+  static void navigateToRepaet(
+      BuildContext context, String exerciseId, String patientId) async {
+    Map<String, dynamic>? exerciseDetails =
+        await Database.getExerciseDetails(exerciseId, patientId);
 
     if (exerciseDetails != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Repeat(exerciseId: exerciseId,patientId:patientId),
+          builder: (context) =>
+              Repeat(exerciseId: exerciseId, patientId: patientId),
         ),
       );
     }
   }
+  //=======================update logging counter======================================
+
+  // static Future<String> updateLoggingCounter({required String docId}) async {
+  //
+  // }
 }
-
-
-
-

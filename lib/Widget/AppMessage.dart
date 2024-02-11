@@ -62,5 +62,9 @@ class AppMessage {
   static String dateOfBirth = 'Date of birth';
   static String send = 'send';
   static String emailFormat = 'Email Format';
+  static String exceededLoginLimit = 'You have exceeded the login limit. You must click on forgot Password to be able to log in again';
+  static String unActiveNotification='Do you want to deactivate notifications?';
+  static String alerts='Alerts';
+
 }
 

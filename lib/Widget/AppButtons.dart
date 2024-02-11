@@ -32,6 +32,9 @@ class AppButtons extends StatelessWidget {
       height: 50.h,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSize.textFieldsBorderRadius),
+          ),
           backgroundColor: bagColor ?? AppColor.buttonsColor,
           elevation: elevation ?? 1.0,
           textStyle: TextStyle(

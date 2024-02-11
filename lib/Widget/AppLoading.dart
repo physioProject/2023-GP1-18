@@ -63,11 +63,13 @@ class AppLoading {
                             children: [
                               SizedBox(height: 10.h),
 //continent tittle-------------------------------------------------------------------
-                              AppText(
-                                fontSize: AppSize.subTextSize + 2,
-                                text: content,
-                                color: AppColor.black,
-                                align: TextAlign.center,
+                              Flexible(
+                                child: AppText(
+                                  fontSize: AppSize.subTextSize + 2,
+                                  text: content,
+                                  color: AppColor.black,
+                                  align: TextAlign.center,
+                                ),
                               ),
 
 //divider-------------------------------------------------------------------
@@ -82,7 +84,7 @@ class AppLoading {
 //bottoms-------------------------------------------------------------------
 
                               showButtom
-                                  ? Expanded(
+                                  ? Flexible(
                                       flex: 2,
                                       child: Row(
                                           crossAxisAlignment:
