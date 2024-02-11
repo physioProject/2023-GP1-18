@@ -32,7 +32,7 @@ class _AddAlertState extends State<AddAlert> {
   TextEditingController bodyController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey();
   TimeOfDay? time;
-  bool isRepeat = true;
+
 
   @override
   Widget build(BuildContext context) {
@@ -99,34 +99,7 @@ class _AddAlertState extends State<AddAlert> {
                 height: 10.h,
               ),
 
-              ///repeat=================================================================================
-              showRow(
-                  label: 'Repeat',
-                  child: InkWell(
-                    onTap: () async {
-                      time = await show();
-                      setState(() {});
-                      print('selectedTime: ${time?.hour}-${time?.minute}');
-                    },
-                    child: Container(
-                      height: 40.h,
-                      decoration: AppWidget.decoration(
-                          shadow: false,
-                          radius: AppSize.textFieldsBorderRadius),
-                      child: Center(
-                        child: Checkbox(
-                          value: isRepeat,
-                          onChanged: (v) {
-                            isRepeat = v!;
-                            setState(() {});
-                          },
-                        ),
-                      ),
-                    ),
-                  )),
-              SizedBox(
-                height: 10.h,
-              ),
+              ///repeat=================================================================================ظ
 
               ///button=================================================================================
               AppButtons(
@@ -141,7 +114,7 @@ class _AddAlertState extends State<AddAlert> {
                       hour: time == null ? TimeOfDay.now().hour : time!.hour,
                       minute:
                           time == null ? TimeOfDay.now().minute : time!.minute,
-                      repeats: isRepeat,
+                      repeats:false,
                       active: 1,
                     );
                     LocalNotificationServices.showNotification(message);
