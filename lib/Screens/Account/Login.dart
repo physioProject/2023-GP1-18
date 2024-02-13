@@ -28,8 +28,10 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   late Image bcImage;
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController =
+      TextEditingController(text: "vrpatient@gmail.com");
+  TextEditingController passwordController =
+      TextEditingController(text: "Ep#50682");
   GlobalKey<FormState> logKey = GlobalKey();
   String? selectedType;
   final storage = new FlutterSecureStorage();
@@ -153,7 +155,6 @@ class _LoginState extends State<Login> {
                   text: AppMessage.loginTx,
                   bagColor: AppColor.iconColor,
                   onPressed: () async {
-                    List getLogCounter;
                     FocusManager.instance.primaryFocus?.unfocus();
 
                     if (logKey.currentState?.validate() == true) {
@@ -173,19 +174,24 @@ class _LoginState extends State<Login> {
                         else if (v == 'user-not-found') {
                           // int de= await DatabaseHelper.deleteLogCounter();
                           // print('database deleted $de');
-                          getLogCounter = await DatabaseHelper.getLogCounter();
-                          print('Counter length is: ${getLogCounter.length}');
-                          getLogCounter.isEmpty
+
+                           (await DatabaseHelper.getLogCounter()).isEmpty
                               ? await DatabaseHelper.addLogCounter(1)
                               : await DatabaseHelper.updateLogCounter(
-                                  getLogCounter.first['logCont'] + 1);
-                          print('getLogCounter is: $getLogCounter');
+                                  (await DatabaseHelper.getLogCounter())
+                                          .first['logCont'] +
+                                      1);
+                          print(
+                              'Counter length in wrong email-pass is: ${(await DatabaseHelper.getLogCounter())}');
                           if (!mounted) return;
                           Navigator.pop(context);
 
                           ///if user login mor than 3 time will block
-                          if (getLogCounter.isNotEmpty) {
-                            getLogCounter.first['logCont'] >= 3
+                          if ((await DatabaseHelper.getLogCounter())
+                              .isNotEmpty) {
+                            (await DatabaseHelper.getLogCounter())
+                                        .first['logCont'] >=
+                                    3
                                 ? AppLoading.show(context, AppMessage.loginTx,
                                     AppMessage.exceededLoginLimit)
                                 : AppLoading.show(context, AppMessage.loginTx,
@@ -197,105 +203,21 @@ class _LoginState extends State<Login> {
 
 //IF found============================================================================================================
                         } else {
-                          getLogCounter = await DatabaseHelper.getLogCounter();
                           if (!mounted) return;
 
-                          ///check if user reset password or not
-                          getLogCounter.isNotEmpty
-                              ? {
-                                  print(
-                                      'getLogCounter if correct data: $getLogCounter'),
-                                  Navigator.pop(context),
-                                  AppLoading.show(context, AppMessage.loginTx,
-                                      AppMessage.exceededLoginLimit)
-                                }
-                              : FirebaseFirestore.instance
-                                  .collection('users')
-                                  .where('userId', isEqualTo: v)
-                                  .get()
-                                  .then((typeFromDB) async {
-                                  Navigator.pop(context);
-                                  for (var element in typeFromDB.docs) {
-                                    if (element.data()['type'] ==
-                                            selectedType &&
-                                        element.data()['activeUser'] == true) {
-                                      if (element.data()['type'] ==
-                                          AppConstants.typeIsPatient) {
-                                        String patientId =
-                                            element.data()['userId'];
-                                        AppRoutes.pushReplacementTo(
-                                            context,
-                                            PatientHome(
-                                              name: element
-                                                      .data()['firstName'] +
-                                                  ' ' +
-                                                  element.data()['lastName'],
-                                              patientId: patientId,
-                                            ));
-                                      } else if (element.data()['type'] ==
-                                          AppConstants.typeIsTherapist) {
-                                        if (selectedType ==
-                                            AppConstants.typeIsTherapist) {
-                                          String therapistId =
-                                              element.data()['userId'];
-                                          AppRoutes.pushReplacementTo(
-                                              context,
-                                              ViewPatients(
-                                                therapistId: therapistId,
-                                                name: element
-                                                        .data()['firstName'] +
-                                                    ' ' +
-                                                    element.data()['lastName'],
-                                              ));
-                                        } else {
-                                          AppRoutes.pushReplacementTo(
-                                              context,
-                                              ViewPatients(
-                                                therapistId: '',
-                                                name: element
-                                                        .data()['firstName'] +
-                                                    ' ' +
-                                                    element.data()['lastName'],
-                                              ));
-                                        }
-                                      } else {
-                                        AppRoutes.pushReplacementTo(
-                                            context, const AdminHome());
-                                      }
-                                    } else {
-                                      getLogCounter =
-                                          await DatabaseHelper.getLogCounter();
-                                      print(
-                                          'Counterققققق length is: ${getLogCounter.length}');
-                                      getLogCounter.isEmpty
-                                          ? await DatabaseHelper.addLogCounter(
-                                              1)
-                                          : await DatabaseHelper
-                                              .updateLogCounter(getLogCounter
-                                                      .first['logCont'] +
-                                                  1);
-                                      print('getLogCounter is: $getLogCounter');
+                          List cont = await DatabaseHelper.getLogCounter();
 
-                                      ///if user login mor than 3 time will block
-                                      if (getLogCounter.isNotEmpty) {
-                                        getLogCounter.first['logCont'] >= 3
-                                            ? AppLoading.show(
-                                                context,
-                                                AppMessage.loginTx,
-                                                AppMessage.exceededLoginLimit)
-                                            : AppLoading.show(
-                                                context,
-                                                AppMessage.loginTx,
-                                                AppMessage.userNotFound);
-                                      } else {
-                                        AppLoading.show(
-                                            context,
-                                            AppMessage.loginTx,
-                                            AppMessage.userNotFound);
-                                      }
-                                    }
-                                  }
-                                });
+                          ///check if user reset password or not
+                          if (cont.isNotEmpty) {
+                            if (cont.first['logCont'] > 3) {
+                              AppLoading.show(context, AppMessage.loginTx,
+                                  AppMessage.exceededLoginLimit);
+                            } else {
+                              viewResult(v);
+                            }
+                          } else {
+                            viewResult(v);
+                          }
                         }
                       });
                     }
@@ -307,5 +229,72 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
+  }
+
+  void viewResult(v) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .where('userId', isEqualTo: v)
+        .get()
+        .then((typeFromDB) async {
+      Navigator.pop(context);
+      for (var element in typeFromDB.docs) {
+        if (element.data()['type'] == selectedType &&
+            element.data()['activeUser'] == true) {
+          if (element.data()['type'] == AppConstants.typeIsPatient) {
+            String patientId = element.data()['userId'];
+            AppRoutes.pushReplacementTo(
+                context,
+                PatientHome(
+                  name: element.data()['firstName'] +
+                      ' ' +
+                      element.data()['lastName'],
+                  patientId: patientId,
+                ));
+          } else if (element.data()['type'] == AppConstants.typeIsTherapist) {
+            if (selectedType == AppConstants.typeIsTherapist) {
+              String therapistId = element.data()['userId'];
+              AppRoutes.pushReplacementTo(
+                  context,
+                  ViewPatients(
+                    therapistId: therapistId,
+                    name: element.data()['firstName'] +
+                        ' ' +
+                        element.data()['lastName'],
+                  ));
+            } else {
+              AppRoutes.pushReplacementTo(
+                  context,
+                  ViewPatients(
+                    therapistId: '',
+                    name: element.data()['firstName'] +
+                        ' ' +
+                        element.data()['lastName'],
+                  ));
+            }
+          } else {
+            AppRoutes.pushReplacementTo(context, const AdminHome());
+          }
+        } else {
+          (await DatabaseHelper.getLogCounter()).isEmpty
+              ? await DatabaseHelper.addLogCounter(1)
+              : await DatabaseHelper.updateLogCounter(
+                  (await DatabaseHelper.getLogCounter()).first['logCont'] + 1);
+          print('getLogCounter is: ${(await DatabaseHelper.getLogCounter())}');
+
+          ///if user login mor than 3 time will block
+          if ((await DatabaseHelper.getLogCounter()).isNotEmpty) {
+            (await DatabaseHelper.getLogCounter()).first['logCont'] >= 3
+                ? AppLoading.show(
+                    context, AppMessage.loginTx, AppMessage.exceededLoginLimit)
+                : AppLoading.show(
+                    context, AppMessage.loginTx, AppMessage.userNotFound);
+          } else {
+            AppLoading.show(
+                context, AppMessage.loginTx, AppMessage.userNotFound);
+          }
+        }
+      }
+    });
   }
 }

@@ -39,7 +39,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
         ///delete logging restriction
         int de = await DatabaseHelper.deleteLogCounter();
-        print('database deleted $de');
+        print('deleteLogCounter is $de');
       } else {
         if (!mounted) return;
         AppLoading.show(
