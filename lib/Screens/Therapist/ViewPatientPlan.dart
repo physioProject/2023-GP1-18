@@ -24,7 +24,7 @@ class ViewPatientPlan extends StatefulWidget {
   State<ViewPatientPlan> createState() => _ViewPatientPlanState();
 }
 class _ViewPatientPlanState extends State<ViewPatientPlan> {
-  late ImageProvider exerciseImg= AssetImage(AppImage.exercise);
+  late ImageProvider exerciseImg= AssetImage(AppImage.plan);
   Future<void> deleteExercise(String documentId) async {
     try {
       await AppConstants.exerciseCollection.doc(documentId).delete();
@@ -84,9 +84,10 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
           print('Error parsing finishDate: $error');
         }
 
-        var exerciseImage = Image(
+        var exerciseImage =
+        Image(
           image: exerciseImg,
-          fit: BoxFit.cover,
+          fit:BoxFit.scaleDown,
           color: isExerciseFinished ? Colors.grey : null,
           colorBlendMode: BlendMode.saturation,
         );
@@ -103,9 +104,9 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
                   tileColor: AppColor.white,
                   leading: CircleAvatar(
                     radius: 30.sp,
-                    child: ClipOval(
+
                       child: exerciseImage,
-                    ),
+
                   ),
                   trailing: isExerciseFinished ? SizedBox(
                     width: 90,
