@@ -1,166 +1,206 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:physio/Widget/AppColor.dart';
+import '../../Widget/AppButtons.dart';
+import '../../Widget/AppImage.dart';
 import '../../../Widget/AppBar.dart';
 import '../../../Widget/AppMessage.dart';
-import 'package:physio/Widget/AppLoading.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../Widget/AppImage.dart';
-import '../../Widget/AppTextFields.dart';
-import '../../Widget/AppValidator.dart';
-
-class ViewPatientInfo extends StatefulWidget {
+import '../../Widget/AppColor.dart';
+import '../../Widget/AppConstants.dart';
+import '../../Widget/AppIcons.dart';
+import '../../Widget/AppLoading.dart';
+import '../../Widget/AppRoutes.dart';
+import 'package:physio/Screens/Therapist/AddNewExercise.dart';
+import '../../Widget/AppSize.dart';
+import '../../Widget/AppText.dart';
+import 'package:physio/Screens/Therapist/UpdateExercise.dart';
+import 'package:physio/Screens/Therapist/Repeat.dart';
+class ViewPatientPlan extends StatefulWidget {
   final String PatientId;
-  const ViewPatientInfo({Key? key,required this.PatientId}) : super(key: key);
+
+  const ViewPatientPlan({Key? key, required this.PatientId, }) : super(key: key);
 
   @override
-  State<ViewPatientInfo> createState() => _ViewPatientInfoState();
-}class _ViewPatientInfoState extends State<ViewPatientInfo> {
-  String patientName = '';
-  String patientCondition = '';
-  String patientEmail = '';
-  String age = '';
-  late ImageProvider profileImg;
-  TextEditingController nameController = TextEditingController();
-  TextEditingController  ageController= TextEditingController();
-  TextEditingController conditionController= TextEditingController();
-  TextEditingController emailController= TextEditingController();
-  @override
-  void initState() {
-    super.initState();
-    fetchPatientData();
-    profileImg = AssetImage(AppImage.pro);
-  }
-
-  Future<void> fetchPatientData() async {
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('userId', isEqualTo: widget.PatientId)
-        .get();
-
-    setState(() {
-      final document = querySnapshot.docs.first;
-      patientName = '${document['firstName']} ${document['lastName']}';
-      DateTime dateOfBirth = document['dateOfBirth'].toDate();
-      age = _calculateAge(dateOfBirth).toString();
-      patientCondition = document['condition'];
-      patientEmail = document['email'];
-      nameController.text=patientName;
-      ageController.text=age;
-      conditionController.text=patientCondition;
-      emailController.text=patientEmail;
-    });
-  }
-  //==============================calculate age===============================================================
-  int _calculateAge(DateTime dateOfBirth) {
-    DateTime currentDate = DateTime.now();
-    int age = currentDate.year - dateOfBirth.year;
-    if (currentDate.month < dateOfBirth.month ||
-        (currentDate.month == dateOfBirth.month &&
-            currentDate.day < dateOfBirth.day)) {
-      age--;
+  State<ViewPatientPlan> createState() => _ViewPatientPlanState();
+}
+class _ViewPatientPlanState extends State<ViewPatientPlan> {
+  late ImageProvider exerciseImg= AssetImage(AppImage.plan);
+  Future<void> deleteExercise(String documentId) async {
+    try {
+      await AppConstants.exerciseCollection.doc(documentId).delete();
+    } catch (e) {
+      print('Error deleting exercise: $e');
     }
-    return age;
   }
 
-//==============================open email===============================================================
-  void openEmail() async {
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: patientEmail,
+  Future<void> showDeleteConfirmationDialog(String documentId) async {
+    AppLoading.show(
+      context,
+      'Delete exercise',
+      'Do you want to delete this exercise for this patient?',
+      showButtom: true,
+      noFunction: () {
+
+      },
+      yesFunction: () async {
+        Navigator.pop(context);
+        await deleteExercise(documentId);
+
+      },
     );
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    } else {
-        AppLoading.show(context,'open','could not launch email');
-    }
   }
 
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWidget(text: AppMessage.PatientInfo),
+  void navigateToUpdateExercise(String documentId, String patientId) {
+    AppRoutes.pushTo(context, UpdateExercise(exerciseId: documentId,patientId:patientId,));
+  }
+  void navigateToRepeat(String documentId,String patientId) {
+    AppRoutes.pushTo(context, Repeat(exerciseId: documentId,patientId: patientId,));
+  }
+  Widget body(BuildContext context, AsyncSnapshot<QuerySnapshot>? snapshot) {
+    if (snapshot == null ||!snapshot.hasData||  snapshot.data == null) {
+      return Center(
+        child: AppText(
+          text: AppMessage.noData,
+          fontSize: AppSize.subTextSize,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
 
-      body: Center(
+    var dataDocs = snapshot.data!.docs;
+    return dataDocs.length > 0
+        ? ListView.builder(
+      itemCount: dataDocs.length,
+      itemBuilder: (context, i) {
+        var data = dataDocs[i].data() as Map<String, dynamic>;
+        var documentId = dataDocs[i].id;
+        var finishDate;
+        var isExerciseFinished = false;
 
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery
-                  .of(context)
-                  .size
-                  .width * 0.1,
+        try {
+          finishDate = DateTime.parse(data['finishDate'].toString());
+          isExerciseFinished = finishDate.isBefore(DateTime.now());
+        } catch (error) {
+          print('Error parsing finishDate: $error');
+        }
 
-            ),
-            child: ListView(
-              children: [CircleAvatar(
-                radius: 100.sp,
-                child: ClipOval(
-                  child: Image(
-                    image: profileImg,
-                    fit: BoxFit.cover,
+        var exerciseImage =
+        Image(
+          image: exerciseImg,
+          fit:BoxFit.scaleDown,
+          color: isExerciseFinished ? Colors.grey : null,
+          colorBlendMode: BlendMode.saturation,
+        );
+
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.h),
+          child: SizedBox(
+            height: 100.h,
+            width: double.maxFinite,
+            child: Card(
+              elevation: 5,
+              child: Center(
+                child: ListTile(
+                  tileColor: AppColor.white,
+                  leading: CircleAvatar(
+                    radius: 30.sp,
+
+                      child: exerciseImage,
+
                   ),
+                  trailing: isExerciseFinished ? SizedBox(
+                    width: 90,
+                    height: 30,
+                    child: AppButtons(
+                      onPressed: () {
+                        navigateToRepeat(documentId,widget.PatientId);
+
+                      },
+                      text: 'Repeat',
+                      bagColor: Colors.green,
+                    ),
+                  ) : InkWell(
+                    onTap: () {
+                      showDeleteConfirmationDialog(documentId);
+                    },
+                    child: Icon(
+                      AppIcons.delete,
+                      size: 30.spMin,
+                      color: AppColor.errorColor,
+                    ),
+                  ),
+                  title: InkWell(
+                    onTap: () {
+                      navigateToUpdateExercise(documentId,widget.PatientId);
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Plan Name:', // Header text
+                          style: TextStyle(
+                            fontSize: AppSize.subTextSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 5), // Add spacing
+                        Text(
+                          data['planName'].toString(),
+                          style: TextStyle(
+                            fontSize: AppSize.subTextSize,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 ),
               ),
-                SizedBox(
-                  height: 40.h,
-                ), 
-                
-   //==============================full name===============================================================
-                AppTextFields(
-                  controller: nameController,
-                  labelText: AppMessage.fullName,
-                  validator: (v) => AppValidator.validatorName(v),
-                  obscureText: false,
-                  enable: false,
-
-                ),
-
-                SizedBox(
-                  height: 10.h,
-                ),
-//==============================age===============================================================
-                AppTextFields(
-                  controller: ageController,
-                  labelText: AppMessage.age,
-                  validator: (v) => AppValidator.validatorEmpty(v),
-                  obscureText: false,
-                  enable: false,
-                ),
-                SizedBox(
-                  height: 10.h,
-                ),
-//==============================condition===============================================================
-                AppTextFields(
-                  controller: conditionController,
-                  labelText: AppMessage.condition,
-                  validator: (v) => AppValidator.validatorEmpty(v),
-                  obscureText: false,
-                  enable: false,
-                ),
-                SizedBox(
-                  height: 10.h,
-                ),
-//==============================email===============================================================
-            InkWell(
-              onTap: openEmail,
-                child: AppTextFields(
-                  controller: emailController,
-
-                  labelText: AppMessage.emailTx,
-                  validator: (v) => AppValidator.validatorEmail(v),
-                  obscureText: false,
-                  enable: false,
-                ),),
-                SizedBox(
-                  height: 10.h,
-                ),
-
-              ],
             ),
           ),
-
+        );
+      },
+    )
+        : Center(
+      child: AppText(
+        text: AppMessage.noData,
+        fontSize: AppSize.subTextSize,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBarWidget(text: AppMessage.PatientPlan),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColor.iconColor,
+        elevation: 10,
+        child: Icon(AppIcons.add
+        ),
+        onPressed: () {
+          AppRoutes.pushTo(context, AddNewExercise(PatientId: widget.PatientId));
+        },
+      ),
+      body: StreamBuilder(
+        stream: AppConstants.exerciseCollection
+            .where('userId', isEqualTo: widget.PatientId)
 
+            .orderBy('finishDate', descending: true)
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('${snapshot.error}'));
+          }
+          if (snapshot.hasData) {
+            return body(context, snapshot);
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
+  }
 }
+
