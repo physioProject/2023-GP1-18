@@ -220,8 +220,7 @@ class Database {
 
   //=============================send password to user email=================================================
   static Future sendPasswordToUser({required Map<String, dynamic> data}) async {
-    final mailer = Mailer(
-        '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');
+    final mailer = Mailer('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');
     final toAddress = Address(data['email']);
     final fromAddress = Address('ljyn8555@gmail.com');
     final content =
