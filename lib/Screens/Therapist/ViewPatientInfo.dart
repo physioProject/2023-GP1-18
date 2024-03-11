@@ -30,7 +30,7 @@ class ViewPatientInfo extends StatefulWidget {
   void initState() {
     super.initState();
     fetchPatientData();
-    profileImg = AssetImage(AppImage.profile);
+    profileImg = AssetImage(AppImage.pro);
   }
 
   Future<void> fetchPatientData() async {
@@ -164,3 +164,4 @@ class ViewPatientInfo extends StatefulWidget {
   }
 
 }
+

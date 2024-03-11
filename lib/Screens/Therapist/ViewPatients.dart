@@ -15,6 +15,7 @@ import '../../../Widget/generalWidget.dart';
 import 'package:physio/Screens/Account/Login.dart';
 import 'package:physio/Screens/Therapist/TherapistHome.dart';
 
+import '../../Widget/AppImage.dart';
 import '../Patient/ChangePass.dart';
 
 class ViewPatients extends StatefulWidget {
@@ -27,6 +28,7 @@ class ViewPatients extends StatefulWidget {
 }
 String selectedUser='';
 class _ViewTherapistState extends State<ViewPatients> {
+  late ImageProvider exerciseImg= AssetImage(AppImage.pro);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,11 +90,13 @@ class _ViewTherapistState extends State<ViewPatients> {
                     AppRoutes.pushTo(context,TherapistHome(PatientId:selectedUser));},
 
                   tileColor: AppColor.white,
-                  leading: InkWell(
-                    child: Icon(
-                      AppIcons.profile,
-                      size: 45.spMin,
-
+                  leading: CircleAvatar(
+                    radius: 25.0,
+                    child: ClipOval(
+                      child: Image(
+                        image: exerciseImg,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   title: AppText(
@@ -115,3 +119,4 @@ class _ViewTherapistState extends State<ViewPatients> {
     );
   }
 }
+
