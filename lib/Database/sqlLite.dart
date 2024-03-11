@@ -15,15 +15,15 @@ class DatabaseHelper {
     // Open the database
     return db.openDatabase(join(await db.getDatabasesPath(), dbName),
         onCreate: (db, version) async {
-      await db.execute("CREATE TABLE $logCounterTable (logCont INTEGER); ");
-      await db.execute(
-          "CREATE TABLE $notificationsTable (id INTEGER PRIMARY KEY,title TEXT, body TEXT,hour INTEGER, minute INTEGER,repeats INTEGER ,active INTEGER,timestamp INTEGER);");
-    }, version: version);
+          await db.execute("CREATE TABLE $logCounterTable (logCont INTEGER); ");
+          await db.execute(
+              "CREATE TABLE $notificationsTable (id INTEGER PRIMARY KEY,title TEXT, body TEXT,hour INTEGER, minute INTEGER,repeats INTEGER ,active INTEGER,timestamp INTEGER);");
+        }, version: version);
   }
 
-  static Future<int> addLogCounter(int logCount) async {
+  static Future<int> addLogCounter() async {
     final gDb = await getDb();
-    return await gDb.insert(logCounterTable, {'logCont': logCount},
+    return await gDb.insert(logCounterTable, {'logCont': 'log'},
         conflictAlgorithm: db.ConflictAlgorithm.replace);
   }
 

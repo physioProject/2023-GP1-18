@@ -11,7 +11,7 @@ import '../Widget/AppConstants.dart';
 
 class Database {
   static final GoogleSignIn _googleSignIn =
-      GoogleSignIn(scopes: ['https://mail.google.com/']);
+  GoogleSignIn(scopes: ['https://mail.google.com/']);
 
   //=======================patient SingUp ======================================
   static Future<String> patientSingUp({
@@ -26,7 +26,7 @@ class Database {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-              email: email.trim(), password: password);
+          email: email.trim(), password: password);
 
       if (userCredential.user != null) {
         await AppConstants.userCollection.add({
@@ -73,7 +73,7 @@ class Database {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-              email: email.trim(), password: password);
+          email: email.trim(), password: password);
       if (userCredential.user != null) {
         await AppConstants.userCollection.add({
           'firstName': firstName,
@@ -111,19 +111,17 @@ class Database {
         return '${userCredential.user?.uid}';
       }
     } on FirebaseException catch (e) {
+      print('-------${e.message}---------');
       if (e.code == 'user-not-found') {
         return 'user-not-found';
       }
       if (e.code == 'wrong-password') {
         return 'user-not-found';
       }
-      if (e.code == 'invalid-email') {
-        return 'invalid-email';
-      }
-      if (e.code == 'user-disabled') {
-        return 'user-disabled';
+      if (e.code == 'too-many-requests') {
+        return 'too-many-requests';
       } else {
-        print('-------${e.message}---------');
+        print('-------${e.code}---------');
         return 'error';
       }
     } catch (e) {
@@ -140,10 +138,10 @@ class Database {
   //=======================patient SingUp ======================================
   static Future<String> updatePatient(
       {required String firstName,
-      required String lastName,
-      required String docId,
-      required String phone,
-      required String condition}) async {
+        required String lastName,
+        required String docId,
+        required String phone,
+        required String condition}) async {
     try {
       await AppConstants.userCollection.doc(docId).update({
         'firstName': firstName,
@@ -160,9 +158,9 @@ class Database {
   //changPassword===================================================================================
   static Future<String> changPassword(
       {currentUser,
-      required String email,
-      required String oldPass,
-      required String newPassword}) async {
+        required String email,
+        required String oldPass,
+        required String newPassword}) async {
     try {
       var cred = EmailAuthProvider.credential(email: email, password: oldPass);
       await currentUser!.reauthenticateWithCredential(cred).then((value) {
@@ -225,11 +223,11 @@ class Database {
     final toAddress = Address(data['email']);
     final fromAddress = Address('ljyn8555@gmail.com');
     final content =
-        Content('text/plain', 'Your password is ${data['password']}');
+    Content('text/plain', 'Your password is ${data['password']}');
     final subject = 'Hello ${data['firstName'] + ' ' + data['lastName']}';
     final personalization = Personalization([toAddress]);
     final email =
-        Email([personalization], fromAddress, subject, content: [content]);
+    Email([personalization], fromAddress, subject, content: [content]);
 
     try {
       await mailer.send(email);
@@ -248,8 +246,8 @@ class Database {
 
   static deleteAccount(BuildContext context,
       {required String docId,
-      required String userId,
-      required String type}) async {
+        required String userId,
+        required String type}) async {
     try {
       showDialog(
         context: context,
@@ -322,10 +320,10 @@ class Database {
   //=======================AddNewExercise ======================================
   static Future<String> AddNewExercise(
       {required String exercise,
-      required String startDate,
-      required String finishDate,
-      required String userId,
-      required String duration}) async {
+        required String startDate,
+        required String finishDate,
+        required String userId,
+        required String duration}) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
@@ -339,7 +337,7 @@ class Database {
             .get();
         if (snapshot.docs.isEmpty) {
           DocumentReference planRef =
-              await FirebaseFirestore.instance.collection('plan').add({
+          await FirebaseFirestore.instance.collection('plan').add({
             'planName': planName,
             'exercise': exercise,
             'finishDate': finishDate,
@@ -419,7 +417,7 @@ class Database {
       String exerciseId, String patientId) async {
     try {
       DocumentSnapshot exerciseSnapshot =
-          await AppConstants.exerciseCollection.doc(exerciseId).get();
+      await AppConstants.exerciseCollection.doc(exerciseId).get();
 
       if (exerciseSnapshot.exists) {
         return exerciseSnapshot.data() as Map<String, dynamic>?;
@@ -453,7 +451,7 @@ class Database {
   static void navigateToUpdateExercise(
       BuildContext context, String exerciseId, String patientId) async {
     Map<String, dynamic>? exerciseDetails =
-        await Database.getExerciseDetails(exerciseId, patientId);
+    await Database.getExerciseDetails(exerciseId, patientId);
 
     if (exerciseDetails != null) {
       Navigator.push(
@@ -471,7 +469,7 @@ class Database {
   static void navigateToRepaet(
       BuildContext context, String exerciseId, String patientId) async {
     Map<String, dynamic>? exerciseDetails =
-        await Database.getExerciseDetails(exerciseId, patientId);
+    await Database.getExerciseDetails(exerciseId, patientId);
 
     if (exerciseDetails != null) {
       Navigator.push(
@@ -483,9 +481,9 @@ class Database {
       );
     }
   }
-  //=======================update logging counter======================================
+//=======================update logging counter======================================
 
-  // static Future<String> updateLoggingCounter({required String docId}) async {
-  //
-  // }
+// static Future<String> updateLoggingCounter({required String docId}) async {
+//
+// }
 }

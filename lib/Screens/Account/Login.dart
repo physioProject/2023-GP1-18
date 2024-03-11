@@ -29,9 +29,9 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   late Image bcImage;
   TextEditingController emailController =
-      TextEditingController(text: "vrpatient@gmail.com");
+  TextEditingController(text: "vrpatient@gmail.com");
   TextEditingController passwordController =
-      TextEditingController(text: "Ep#50682");
+  TextEditingController(text: "Ep#50682");
   GlobalKey<FormState> logKey = GlobalKey();
   String? selectedType;
   final storage = new FlutterSecureStorage();
@@ -156,7 +156,7 @@ class _LoginState extends State<Login> {
                   bagColor: AppColor.iconColor,
                   onPressed: () async {
                     FocusManager.instance.primaryFocus?.unfocus();
-
+                    if (!mounted) return;
                     if (logKey.currentState?.validate() == true) {
                       AppLoading.show(context, '', 'lode');
                       Database.loggingToApp(
@@ -171,50 +171,35 @@ class _LoginState extends State<Login> {
                               context, AppMessage.loginTx, AppMessage.error);
                         }
 //on user-not-found============================================================================================================
-                        else if (v == 'user-not-found') {
+                        else if (v == 'user-not-found'||v=='too-many-requests') {
+
                           // int de= await DatabaseHelper.deleteLogCounter();
                           // print('database deleted $de');
+                          await DatabaseHelper.addLogCounter();
+                          List contList = await DatabaseHelper.getLogCounter();
+                          print('after add length ${(await DatabaseHelper.getLogCounter()).length}');
 
-                           (await DatabaseHelper.getLogCounter()).isEmpty
-                              ? await DatabaseHelper.addLogCounter(1)
-                              : await DatabaseHelper.updateLogCounter(
-                                  (await DatabaseHelper.getLogCounter())
-                                          .first['logCont'] +
-                                      1);
-                          print(
-                              'Counter length in wrong email-pass is: ${(await DatabaseHelper.getLogCounter())}');
                           if (!mounted) return;
                           Navigator.pop(context);
 
                           ///if user login mor than 3 time will block
-                          if ((await DatabaseHelper.getLogCounter())
-                              .isNotEmpty) {
-                            (await DatabaseHelper.getLogCounter())
-                                        .first['logCont'] >=
-                                    3
-                                ? AppLoading.show(context, AppMessage.loginTx,
-                                    AppMessage.exceededLoginLimit)
-                                : AppLoading.show(context, AppMessage.loginTx,
-                                    AppMessage.userNotFound);
-                          } else {
-                            AppLoading.show(context, AppMessage.loginTx,
-                                AppMessage.userNotFound);
-                          }
 
-//IF found============================================================================================================
+                          contList.length > 3
+                              ? AppLoading.show(context, AppMessage.loginTx,
+                              AppMessage.exceededLoginLimit)
+                              : AppLoading.show(context, AppMessage.loginTx,
+                              AppMessage.userNotFound);
+
+//IF found check type============================================================================================================
                         } else {
-                          if (!mounted) return;
-
-                          List cont = await DatabaseHelper.getLogCounter();
-
+                          List contList = await DatabaseHelper.getLogCounter();
+                          print('contList: $contList');
                           ///check if user reset password or not
-                          if (cont.isNotEmpty) {
-                            if (cont.first['logCont'] > 3) {
-                              AppLoading.show(context, AppMessage.loginTx,
-                                  AppMessage.exceededLoginLimit);
-                            } else {
-                              viewResult(v);
-                            }
+
+                          if (contList.length >= 3) {
+                            Navigator.pop(context);
+                            AppLoading.show(context, AppMessage.loginTx,
+                                AppMessage.exceededLoginLimit);
                           } else {
                             viewResult(v);
                           }
@@ -242,7 +227,11 @@ class _LoginState extends State<Login> {
         if (element.data()['type'] == selectedType &&
             element.data()['activeUser'] == true) {
           if (element.data()['type'] == AppConstants.typeIsPatient) {
+            ///delete logging restriction
+            int de = await DatabaseHelper.deleteLogCounter();
+            print('deleteLogCounter is $de');
             String patientId = element.data()['userId'];
+            if (!mounted) return;
             AppRoutes.pushReplacementTo(
                 context,
                 PatientHome(
@@ -252,8 +241,12 @@ class _LoginState extends State<Login> {
                   patientId: patientId,
                 ));
           } else if (element.data()['type'] == AppConstants.typeIsTherapist) {
+            ///delete logging restriction
+            int de = await DatabaseHelper.deleteLogCounter();
+            print('deleteLogCounter is $de');
             if (selectedType == AppConstants.typeIsTherapist) {
               String therapistId = element.data()['userId'];
+              if (!mounted) return;
               AppRoutes.pushReplacementTo(
                   context,
                   ViewPatients(
@@ -263,6 +256,10 @@ class _LoginState extends State<Login> {
                         element.data()['lastName'],
                   ));
             } else {
+              ///delete logging restriction
+              int de = await DatabaseHelper.deleteLogCounter();
+              print('deleteLogCounter is $de');
+              if (!mounted) return;
               AppRoutes.pushReplacementTo(
                   context,
                   ViewPatients(
@@ -276,23 +273,9 @@ class _LoginState extends State<Login> {
             AppRoutes.pushReplacementTo(context, const AdminHome());
           }
         } else {
-          (await DatabaseHelper.getLogCounter()).isEmpty
-              ? await DatabaseHelper.addLogCounter(1)
-              : await DatabaseHelper.updateLogCounter(
-                  (await DatabaseHelper.getLogCounter()).first['logCont'] + 1);
-          print('getLogCounter is: ${(await DatabaseHelper.getLogCounter())}');
-
-          ///if user login mor than 3 time will block
-          if ((await DatabaseHelper.getLogCounter()).isNotEmpty) {
-            (await DatabaseHelper.getLogCounter()).first['logCont'] >= 3
-                ? AppLoading.show(
-                    context, AppMessage.loginTx, AppMessage.exceededLoginLimit)
-                : AppLoading.show(
-                    context, AppMessage.loginTx, AppMessage.userNotFound);
-          } else {
-            AppLoading.show(
-                context, AppMessage.loginTx, AppMessage.userNotFound);
-          }
+          await DatabaseHelper.addLogCounter();
+          print('after add length ${(await DatabaseHelper.getLogCounter()).length}');
+          AppLoading.show(context, AppMessage.loginTx, AppMessage.userNotFound);
         }
       }
     });
