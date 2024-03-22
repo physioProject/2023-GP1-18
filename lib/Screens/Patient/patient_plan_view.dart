@@ -142,8 +142,12 @@ class _PatientPlanViewState extends State<PatientPlanView> {
               child: Icon(AppIcons.menu),
             ),
             menuList: AppWidget.itemList(
-              onTapChangePass: () => AppRoutes.pushTo(context, const ChangePass()),
-              isChangePassword: true,
+               onTapChangePass: () =>
+                AppRoutes.pushTo(context, const ChangePass()),
+            onTapSetNotification: () =>
+                AppRoutes.pushTo(context, const GetAlert()),
+            isChangePassword: true,
+            isShowNotification: true,
               helloName: 'Hello Patient ${widget.name}',
               action: () {
                 Database.logOut();
