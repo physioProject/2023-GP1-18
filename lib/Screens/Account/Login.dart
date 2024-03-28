@@ -29,9 +29,9 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   late Image bcImage;
   TextEditingController emailController =
-  TextEditingController(text: "vrpatient@gmail.com");
+  TextEditingController();
   TextEditingController passwordController =
-  TextEditingController(text: "Ep#50682");
+  TextEditingController();
   GlobalKey<FormState> logKey = GlobalKey();
   String? selectedType;
   final storage = new FlutterSecureStorage();
