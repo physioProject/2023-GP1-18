@@ -138,15 +138,7 @@ class _ViewPatientReportState extends State<ViewPatientReport> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarWidget(text: 'Reports'),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColor.iconColor,
-        elevation: 10,
-        child: Icon(AppIcons.add
-        ),
-        onPressed: () {
-          AppRoutes.pushTo(context, AddNewExercise(PatientId: widget.PatientId));
-        },
-      ),
+     
       body: StreamBuilder(
         stream: AppConstants.exerciseCollection
             .where('userId', isEqualTo: widget.PatientId)
