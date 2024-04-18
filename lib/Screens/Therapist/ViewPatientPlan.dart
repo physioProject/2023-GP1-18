@@ -24,7 +24,8 @@ class ViewPatientPlan extends StatefulWidget {
   State<ViewPatientPlan> createState() => _ViewPatientPlanState();
 }
 class _ViewPatientPlanState extends State<ViewPatientPlan> {
-  late ImageProvider exerciseImg= AssetImage(AppImage.plan);
+  late ImageProvider exerciseImg = AssetImage(AppImage.plan);
+
   Future<void> deleteExercise(String documentId) async {
     try {
       await AppConstants.exerciseCollection.doc(documentId).delete();
@@ -45,17 +46,68 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
       yesFunction: () async {
         Navigator.pop(context);
         await deleteExercise(documentId);
-
       },
     );
   }
 
   void navigateToUpdateExercise(String documentId, String patientId) {
-    AppRoutes.pushTo(context, UpdateExercise(exerciseId: documentId,patientId:patientId,));
+    AppRoutes.pushTo(
+        context, UpdateExercise(exerciseId: documentId, patientId: patientId,));
   }
-  void navigateToRepeat(String documentId,String patientId) {
-    AppRoutes.pushTo(context, Repeat(exerciseId: documentId,patientId: patientId,));
+
+  Future<void> navigateToRepeat(String documentId, String patientId) async {
+    try {
+      // Retrieve the existing exercise data
+      DocumentSnapshot exerciseSnapshot = await AppConstants.exerciseCollection.doc(documentId).get();
+      Map<String, dynamic> exerciseData = exerciseSnapshot.data() as Map<String, dynamic>;
+
+      // Check if there are any existing exercises with the same start date and exercise
+      QuerySnapshot snapshot = await AppConstants.exerciseCollection
+          .where('userId', isEqualTo: patientId)
+
+          .where('exercise', isEqualTo: exerciseData['exercise'])
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        // Check if the existing exercise is finished
+        bool isExistingExerciseFinished = false;
+        try {
+          DateTime finishDate = DateTime.parse(snapshot.docs.first['finishDate'].toString());
+          isExistingExerciseFinished = finishDate.isBefore(DateTime.now());
+        } catch (e) {
+          print('Error parsing finishDate: $e');
+        }
+
+        if (!isExistingExerciseFinished) {
+          // Display a message if there is an active exercise with the same start date
+          AppLoading.show(
+            context,
+            'Repeat Exercise',
+            'You already have an active plan with the same exercise list. Please complete the existing plan before repeating.',
+          );
+        } else {
+          // Navigate to the Repeat screen
+          AppRoutes.pushTo(context, Repeat(exerciseId: documentId, patientId: patientId));
+        }
+      } else {
+        // Navigate to the Repeat screen
+        AppRoutes.pushTo(context, Repeat(exerciseId: documentId, patientId: patientId));
+      }
+    } catch (e, stackTrace) {
+      print('Error checking existing exercises: $e');
+      print('Stack trace: $stackTrace');
+      // Display an error message if something went wrong
+      AppLoading.show(
+        context,
+        'Error',
+        'An error occurred while checking for existing exercises. Please try again later.',
+      );
+    }
   }
+
+
+
   Widget body(BuildContext context, AsyncSnapshot<QuerySnapshot>? snapshot) {
     if (snapshot == null ||!snapshot.hasData||  snapshot.data == null) {
       return Center(
@@ -203,4 +255,6 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
     );
   }
 }
+
+
 
