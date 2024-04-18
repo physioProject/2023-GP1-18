@@ -228,6 +228,8 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColor.iconColor,
         elevation: 10,
+         child: Icon(AppIcons.add
+        ),
        
         onPressed: () {
           AppRoutes.pushTo(context, AddNewExercise(PatientId: widget.PatientId));
