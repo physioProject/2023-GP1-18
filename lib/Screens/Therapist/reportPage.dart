@@ -41,9 +41,10 @@ class reportPage extends StatefulWidget {
   final String userId;
   final String level;
   final String exercise;
-  final String date;
+  final List<String> dates;
 
-  const reportPage({Key? key, required this.planId, required this.userId,required this.level,required this.exercise,required this.date}) : super(key: key);
+
+  const reportPage({Key? key, required this.planId, required this.userId,required this.level,required this.exercise, required this.dates}) : super(key: key);
 
   @override
   State<reportPage> createState() => _reportPageState();
@@ -167,8 +168,8 @@ class _reportPageState extends State<reportPage> {
     final filteredExercises = exercises.where((score) {
     return score['planId'] == widget.planId &&
     score['exercise'] == widget.exercise &&
-    score['level'] == widget.level &&
-    score['date'] == widget.date;
+    score['level'] == widget.level && widget.dates.contains(score['date']);
+
     }).toList();
 
     if (filteredExercises.isEmpty) {
@@ -183,15 +184,17 @@ class _reportPageState extends State<reportPage> {
     );
     }
 
-    final scores = filteredExercises.map((exerciseData) =>
-    int.parse(exerciseData['score'])).toList();
+    final scores = filteredExercises.map((exerciseData) => int.parse(exerciseData['score'])).toList();
     final scoresString = scores.join(', ');
-
     String imagePath = '';
 
     if (filteredExercises.isNotEmpty) {
-    final score = int.parse(filteredExercises.first['score']);
-    if (widget.level == '1') {
+      final totalScores = scores.reduce((value, element) => value + element);
+      final score = totalScores / filteredExercises.length.round();
+      final int scoreInt = score.round();
+      final String scoreS = scoreInt.toString();
+
+      if (widget.level == '1') {
     if (score <= 200) {
     imagePath = AppImage.Below;
     } else if (score > 200 && score <= 300) {
@@ -264,16 +267,44 @@ class _reportPageState extends State<reportPage> {
       validator: (v) => AppValidator.validatorEmpty(v),
       obscureText: false,
       enable: false,
-    ),
-      SizedBox(height: 10.h),
+    ), SizedBox(height: 10.h),
       AppTextFields(
-        controller: TextEditingController(text: widget.date),
         labelText: 'Exercise Date',
         validator: (v) => AppValidator.validatorEmpty(v),
         obscureText: false,
         enable: false,
-      ),
-      SizedBox(height: 10.h),
+        controller: TextEditingController(
+          text: widget.dates.isEmpty
+              ? ''
+              : widget.dates.length > 1
+              ? '${widget.dates.first} - ${widget.dates.last}'
+              : widget.dates.first,
+        ),
+        onTap: () {
+          if (widget.dates.isNotEmpty) {
+            final smallestDate = widget.dates.reduce((a, b) => a.compareTo(b) < 0 ? a : b);
+            final largestDate = widget.dates.reduce((a, b) => a.compareTo(b) > 0 ? a : b);
+
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Date Range'),
+                content: Text('Start: $smallestDate\nEnd: $largestDate'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        },
+      )
+
+      ,SizedBox(height: 10.h),
       AppTextFields(
         controller: TextEditingController(
             text: filteredExercises.length.toString()),
@@ -284,8 +315,8 @@ class _reportPageState extends State<reportPage> {
       ),
       SizedBox(height: 10.h),
       AppTextFields(
-        controller: TextEditingController(text: scoresString),
-        labelText: 'Scores',
+        controller: TextEditingController(text: scoreS),
+        labelText: 'AVG Score',
         validator: (v) => AppValidator.validatorEmpty(v),
         obscureText: false,
         enable: false,
@@ -296,16 +327,20 @@ class _reportPageState extends State<reportPage> {
           final patientName = await fetchPatientName(widget.userId);
           print('Patient Name: $patientName');
 
-          _shareAsPdf(scoresString, filteredExercises.length, patientName);
+          _shareAsPdf(scoreS, filteredExercises.length, patientName,widget.dates);
         },
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all<Color>(
-              AppColor.black),
+              AppColor.black),  minimumSize: MaterialStateProperty.all(Size(320, 50)), //
         ),
         child: Column(
+
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Share File '),
+            Text('Share File ' ,style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,)),
             Icon(AppIcons.share),
           ],
         ),
@@ -328,7 +363,7 @@ class _reportPageState extends State<reportPage> {
   }
 
 
-    Future<void> _shareAsPdf(String scoresString, int total,String patientName) async {
+    Future<void> _shareAsPdf(String scoresS, int total, String patientName,  List<String> dates) async {
     final pdf = pw.Document();
 
   
@@ -350,7 +385,7 @@ class _reportPageState extends State<reportPage> {
 
 
     String performanceText = '';
-    final score = int.parse(scoresString.split(',').first);
+    final score = int.parse(scoresS.split(',').first);
     if (widget.level == '1') {
       if (score <= 200) {
         performanceText = 'Below average';
@@ -405,9 +440,10 @@ class _reportPageState extends State<reportPage> {
                       pw.Text('Plan Name: ${planName}', style: normalStyle),
                       pw.Text('Exercise Type: ${widget.exercise}', style: normalStyle),
                       pw.Text('Exercise Level: ${widget.level}', style: normalStyle),
-                      pw.Text('Date: ${widget.date}', style: normalStyle),
+                  pw.Text('Date: ${dates.length > 1 ? "${dates.first} - ${dates.last}" : dates.first}',
+                    style: normalStyle,),
                       pw.Text('Total: ${total}', style: normalStyle),
-                      pw.Text('Scores: ${scoresString}', style: normalStyle),
+                      pw.Text('Scores: ${scoresS}', style: normalStyle),
                       pw.SizedBox(height: 10),
                       pw.Text('Patient\'s Performance: ${performanceText}',
                           style: performanceStyle),
@@ -424,3 +460,4 @@ class _reportPageState extends State<reportPage> {
     final bytes = await pdf.save();
     Printing.sharePdf(bytes: bytes, filename: 'patient_report.pdf');
   }}
+
