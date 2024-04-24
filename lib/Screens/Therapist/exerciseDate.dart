@@ -26,6 +26,11 @@ import '../../Widget/GeneralWidget.dart';
 import '../Account/Login.dart';
 
 
+import '../../../Widget/AppMessage.dart';import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../Widget/AppText.dart';
+import '../../Widget/GeneralWidget.dart';
+import '../Account/Login.dart';
 import '../../../Widget/AppMessage.dart';
 class exerciseDate extends StatefulWidget {
   final String planId;
@@ -33,16 +38,24 @@ class exerciseDate extends StatefulWidget {
   final String level;
   final String exercise;
 
-  const exerciseDate({Key? key, required this.planId, required this.userId,required this.level,required this.exercise}) : super(key: key);
+  const exerciseDate({
+    Key? key,
+    required this.planId,
+    required this.userId,
+    required this.level,
+    required this.exercise,
+  }) : super(key: key);
 
   @override
-  State<exerciseDate> createState() => _exerciseDateState();
+  State<exerciseDate> createState() => _ExerciseDateState();
 }
 
-late ImageProvider exerciseImg = AssetImage(AppImage.date);
+class _ExerciseDateState extends State<exerciseDate> {
+  late ImageProvider exerciseImg = AssetImage(AppImage.date);
+  List<String> selectedDates = [];
+  bool isButtonEnabled = false;
+  bool selectAll = false;
 
-class _exerciseDateState extends State<exerciseDate> { // مجموعة لتتبع الـ exercises التي تم عرضها
-  Set<String> displayedDates = Set<String>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,13 +66,10 @@ class _exerciseDateState extends State<exerciseDate> { // مجموعة لتتب�
           if (snapshot.hasError) {
             return Center(child: Text('${snapshot.error}'));
           }
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
-
           final reportData = snapshot.data?.data() as Map<String, dynamic>?;
-
           if (reportData == null || reportData.isEmpty) {
             return Center(
               child: Text(
@@ -71,12 +81,10 @@ class _exerciseDateState extends State<exerciseDate> { // مجموعة لتتب�
               ),
             );
           }
-
           final exercises = reportData.entries
               .where((entry) => entry.key != 'date')
               .map((entry) => entry.value)
               .toList();
-
           if (exercises.isEmpty) {
             return Center(
               child: Text(
@@ -88,16 +96,11 @@ class _exerciseDateState extends State<exerciseDate> { // مجموعة لتتب�
               ),
             );
           }
-
           final filteredExercises = exercises.where((exercise) {
-
-
-              return exercise['planId'] == widget.planId &&
-                  exercise['exercise'] == widget.exercise &&
-                  exercise['level'] == widget.level;
-
+            return exercise['planId'] == widget.planId &&
+                exercise['exercise'] == widget.exercise &&
+                exercise['level'] == widget.level;
           }).toList();
-
           if (filteredExercises.isEmpty) {
             return Center(
               child: Text(
@@ -109,76 +112,128 @@ class _exerciseDateState extends State<exerciseDate> { // مجموعة لتتب�
               ),
             );
           }
-
-          return ListView.builder(
-            itemCount: filteredExercises.length,
-            itemBuilder: (context, index) {
-              final exerciseData = filteredExercises[index];
-
-              final date = exerciseData['date'];
-    if(displayedDates.contains(date)) {
-    return SizedBox.shrink();
-    }else {
-    displayedDates.add(date);}
-
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 5.0),
-                child: SizedBox(
-                  height: 100.0,
-                  width: double.maxFinite,
-                  child: Card(
-                    elevation: 5,
-                    child: Center(
-                      child: ListTile(
-                        tileColor: Colors.white,
-                        leading: CircleAvatar(
-                          radius: 25.0,
-
-                             child: Image(
-                              image: exerciseImg,
-                            ),
-
-                        ),
-                        trailing: SizedBox(
-                          width: 70,
-                          height: 30,
-                        ),
-                        onTap: () {
-                          var selectedexercise =date;
-
-
-                          AppRoutes.pushTo(
-                            context,
-                            reportPage(exercise: widget.exercise,planId:widget.planId,userId:widget.userId,level:widget.level,date:selectedexercise),
-                          );
-                        },
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [Text(
-                            'Exercise Date:',
+          final uniqueDates = filteredExercises.map((exercise) => exercise['date'].toString()).toSet();
+          final sortedDates = uniqueDates.toList()..sort();
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: sortedDates.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Card(elevation: 5,
+                        color: Colors.white,
+                        child: CheckboxListTile(
+                          activeColor: Colors.green,
+                          title: Text(
+                            'Select All',
                             style: TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 18.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                            SizedBox(height: 5.0),
-                            Text(
-                              '$date',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                              ),
-                            ),
-                          ],
+                          value: selectAll,
+                          onChanged: (selected) {
+                            setState(() {
+                              selectAll = selected!;
+                              if (selectAll) {
+                                selectedDates = sortedDates;
+                                isButtonEnabled = true;
+                              } else {
+                                selectedDates.clear();
+                                isButtonEnabled = false;
+                              }
+                            });
+                          },
                         ),
+                      );
+                    }
+                    final date = sortedDates[index - 1];
+                    final isSelected = selectedDates.contains(date);
+                    return Card(elevation: 5,
+
+
+                      child: CheckboxListTile(
+                        activeColor: Colors.green,
+                       
+                        title: Text(
+                          'Exercise Date:',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          '$date',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                          ),
+                        ),
+                        value: isSelected,
+                        onChanged: (selected) {
+                          setState(() {
+                            if (selected!) {
+                              selectedDates.add(date);
+                            } else {
+                              selectedDates.remove(date);
+                            }
+                            isButtonEnabled = selectedDates.isNotEmpty;
+                            selectAll = false;
+                          });
+                        },
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          );
-        },
-      ),
+              ), SizedBox(height: 20.h),
+
+    ElevatedButton(
+        onPressed: isButtonEnabled
+            ? () {
+          if (selectedDates.isNotEmpty) {
+            AppRoutes.pushTo(
+              context,
+              reportPage(
+                exercise: widget.exercise,
+                planId: widget.planId,
+                userId: widget.userId,
+                level: widget.level,
+                dates: selectedDates,
+              ),
+            );
+          }
+        }
+            : null,
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+            if (states.contains(MaterialState.disabled)) {
+              return Colors.grey; // لون رمادي عند التعطيل
+            }
+            return Colors.black; // لون أسود عند التفعيل
+          }),
+          minimumSize: MaterialStateProperty.all(Size(320, 50)), // تعيين حجم البتون
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Generate Report',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+
+                // تعيين حجم الخط
+              ),
+            ),
+          ],
+        ),
+      )
+      ,SizedBox(height: 20.h),
+    ],
+    );
+    },
+        ),
     );
   }
 }
+
