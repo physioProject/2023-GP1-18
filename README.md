@@ -43,13 +43,14 @@ To launch the Physio, follow these steps:
      - SideQuest installed on your computer.
      - USB cable to connect your VR device to your computer.
 
-   - Installation and Setup:
-     1. Ensure that your VR device is set up and properly connected to your computer.
+ - Installation and Setup: 
+     1. Ensure that your VR device is set up and properly connected to your computer. 
      2. Open SideQuest on your computer.
-     3. Navigate to the "My Apps" section in SideQuest.
-     4. Drag and drop the Unity APK file of the Physio VR exercise games into the SideQuest window or click on the "Install APK file" button in SideQuest and select the APK file.
-     5. SideQuest will install the APK file on your VR device.
-     6. Once the installation is complete, disconnect your VR device from the computer.
-     7. Put on your VR headset and navigate to the "Library" or "Unknown Sources" section on your VR device.
-     8. Find and launch the installed Physio VR exercise games from the list of available apps.
+     3. A pop up window will appear inside your headset to authorize your laptop, click “Yes”
+4. After the authorization is done, click on “install APK” icon on the top of the page of SideQuest. 
+     5. Drag and drop the Unity APK file of the Physio VR exercise games. 
+     6. SideQuest will install the APK file on your VR device. 
+     7. Once the installation is complete, disconnect your VR device from the computer. 
+     8. Put on your VR headset and navigate to the "Unknown Sources" section on your VR device. 
+     9. Find and launch the installed Physio VR exercise games from the list of available apps.
 
