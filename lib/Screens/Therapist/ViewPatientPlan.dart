@@ -55,7 +55,7 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
         context, UpdateExercise(exerciseId: documentId, patientId: patientId,));
   }
 
-  Future<void> navigateToRepeat(String documentId, String patientId) async {
+ Future<void> navigateToRepeat(String documentId, String patientId) async {
     try {
       // Retrieve the existing exercise data
       DocumentSnapshot exerciseSnapshot = await AppConstants.exerciseCollection.doc(documentId).get();
@@ -64,13 +64,11 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
       // Check if there are any existing exercises with the same start date and exercise
       QuerySnapshot snapshot = await AppConstants.exerciseCollection
           .where('userId', isEqualTo: patientId)
-
           .where('exercise', isEqualTo: exerciseData['exercise'])
           .limit(1)
           .get();
 
       if (snapshot.docs.isNotEmpty) {
-        // Check if the existing exercise is finished
         bool isExistingExerciseFinished = false;
         try {
           DateTime finishDate = DateTime.parse(snapshot.docs.first['finishDate'].toString());
@@ -97,6 +95,7 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
     } catch (e, stackTrace) {
       print('Error checking existing exercises: $e');
       print('Stack trace: $stackTrace');
+
       // Display an error message if something went wrong
       AppLoading.show(
         context,
@@ -105,8 +104,6 @@ class _ViewPatientPlanState extends State<ViewPatientPlan> {
       );
     }
   }
-
-
 
   Widget body(BuildContext context, AsyncSnapshot<QuerySnapshot>? snapshot) {
     if (snapshot == null ||!snapshot.hasData||  snapshot.data == null) {
